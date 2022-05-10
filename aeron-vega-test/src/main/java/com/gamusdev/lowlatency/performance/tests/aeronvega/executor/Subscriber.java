@@ -5,26 +5,35 @@ import com.bbva.kyof.vega.msg.IRcvMessage;
 import com.bbva.kyof.vega.msg.IRcvRequest;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.subscriber.ITopicSubListener;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.Constants;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Vega Subscriber
+ * This class subscribe to the topic, and receives all the integers.
+ */
 @Slf4j
 public class Subscriber implements IClient {
 
-    /** Name of the topic */
-    private static final String TOPIC_NAME = "VegaTopic";
+    /** The checksum is the sum of all the messageId published */
+    private AtomicLong checksum = new AtomicLong();
 
-    // ID to finnish testing
-    private static final int CLOSE_ID = Integer.MAX_VALUE;
-    // Messages received
+    /** Messages received */
     private AtomicInteger receivedMsgs = new AtomicInteger();
-    // Flag to close
+
+    /** Flag to close */
     boolean close;
 
-    public void run(final IVegaInstance instance) throws VegaException, InterruptedException {
+    /**
+     * Subscribe to the topic and receive the integers
+     * @param instance Vega Instance
+     * @throws VegaException VegaException
+     */
+    public void run(final IVegaInstance instance) throws VegaException {
 
         // Create a listener
         ITopicSubListener listener = new ITopicSubListener()
@@ -41,43 +50,52 @@ public class Subscriber implements IClient {
                 // allocate a new ByteBuffer. It is used the unsafeBuffer directly
                 int receivedId = receivedMessage.getContents().getInt(msgOffset, ByteOrder.nativeOrder());
 
-                log.info("Received messageId {}", receivedId);
-
-                if(receivedId == CLOSE_ID)
-                {
+                if(receivedId == Constants.CLOSE_ID) {
                     close=true;
+                }
+                else {
+                    checksum.addAndGet(receivedId);
                 }
             }
 
             @Override
             public void onRequestReceived(IRcvRequest receivedRequest) {
+                // Do not used in the test
             }
         };
 
         try
         {
             // Subscribe to the topic
-            instance.subscribeToTopic(TOPIC_NAME, listener);
+            instance.subscribeToTopic(Constants.TOPIC_NAME, listener);
 
-            while(!close)
-            {
+            // Start time
+            long startTime = 0;
+            long startNanoTime = 0;
+
+            while(!close) {
+                // If the first message is received, take the startTime
+                if (receivedMsgs.get() == 1 && startTime == 0) {
+                    startTime = System.currentTimeMillis();
+                    startNanoTime = System.nanoTime();
+                }
+
                 Thread.sleep(1);
             }
+
+            // Take the duration
+            long endTime = System.currentTimeMillis() - startTime;
+            long endNanoTime = System.nanoTime() - startNanoTime;
+
+            log.info("****** Finnished publisher test with receivedMsgs={}." +
+                    " Checksum={} ******",receivedMsgs, checksum);
+
+            log.info("****** Duration endTime={}ms and endNanoTime={}ns ******",endTime, endNanoTime);
+
         }
-        catch (InterruptedException e)
-        {
+        catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-
-    /**
-     * Method to close the subscriber
-     * @throws IOException
-     */
-    public void close() throws IOException {
-        log.info("Closing subscriber");
-        //instance.close();
-        log.info("Closed tested subscriber with receivedMsgs={}", receivedMsgs);
-    }
 }
