@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor.vega;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
 
 import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.IRcvMessage;
@@ -12,7 +12,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class Subscriber {
+public class Subscriber implements IClient {
 
     /** Name of the topic */
     private static final String TOPIC_NAME = "VegaTopic";

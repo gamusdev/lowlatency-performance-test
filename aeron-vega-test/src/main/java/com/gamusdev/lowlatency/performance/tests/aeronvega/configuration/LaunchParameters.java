@@ -20,9 +20,7 @@ public class LaunchParameters {
     @Getter
     private ClientType clientType = ClientType.SUB;
 
-    @Getter
-    private TestType testType = TestType.ALL;
-
+    /** Vega configuration XML file path */
     @Getter
     private String vegaConfigFilePath;
 
@@ -32,29 +30,22 @@ public class LaunchParameters {
      * @param pConfigFilePath Vega xml file configuration
      * @param pClientType PUB / SUB mode
      */
-    public LaunchParameters (String pConfigFilePath, String pClientType, String pTestType)
+    public LaunchParameters (String pConfigFilePath, String pClientType)
             throws GenericAeronVegaException {
-
-        // Check the test type is given and valid. If yes, replace the value
-        if (EnumUtils.isValidEnumIgnoreCase(TestType.class, pTestType)) {
-            this.testType = TestType.valueOf(pTestType.toUpperCase(Locale.ROOT));
-        }
 
         // Check if client type is given and valid. If yes, replace the value
         if (EnumUtils.isValidEnumIgnoreCase(ClientType.class, pClientType)) {
             this.clientType = ClientType.valueOf(pClientType.toUpperCase(Locale.ROOT));
         }
 
-        // Test if VegaTest will be executed and vegaConfigFilePath is a valid path to an XML file
-        if ( TestType.ALL == this.testType || TestType.VEGA == this.testType) {
-
-            if (StringUtils.isEmpty(pConfigFilePath) || Files.notExists(Path.of(pConfigFilePath))) {
-                throw new GenericAeronVegaException("The parameter vegaConfigFilePath must be valid");
-            }
-
-            // Set Vega config file
-            this.vegaConfigFilePath = pConfigFilePath;
+        // Check if the vega config xml file exists
+        if (StringUtils.isEmpty(pConfigFilePath) || Files.notExists(Path.of(pConfigFilePath))) {
+            throw new GenericAeronVegaException("The parameter vegaConfigFilePath must be valid");
         }
+
+        // Set Vega config file
+        this.vegaConfigFilePath = pConfigFilePath;
+
     }
 
 }

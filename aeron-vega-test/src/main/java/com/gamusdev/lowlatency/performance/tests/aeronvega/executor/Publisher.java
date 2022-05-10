@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor.vega;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,7 +14,7 @@ import org.agrona.concurrent.UnsafeBuffer;
  * Vega Publisher
  */
 @Slf4j
-public class Publisher {
+public class Publisher implements IClient {
 
     /** Number of the topic */
     private static final String TOPIC_NAME = "VegaTopic";

@@ -6,6 +6,6 @@ java -cp ./target/aeron-vega-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.b
 
 # Launch aeron-vega-test
 ### As subscriber
-java -cp ./target/aeron-vega-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.main -f /tmp/vega/subscriber.xml
+java -cp ./target/aeron-vega-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -f /tmp/vega/subscriber.xml
 ### As publisher
-java -cp ./target/aeron-vega-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.main -t pub -f /tmp/vega/publisher.xml
+java -cp ./target/aeron-vega-test-1.0.0-SNAPSHOT-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -t pub -f /tmp/vega/publisher.xml

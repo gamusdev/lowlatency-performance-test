@@ -18,11 +18,6 @@ class CommandLineParser
                     "\"pub\" for publisher, \"sub\" for subscriber" +
                     " Default Value: subscriber");
 
-    /** Parameter to indicate the test to execute */
-    private final Option testType = new Option("t", "testType", true,
-            "(Optional) Test type to execute: TCP, UDP, Vega, RabbitMQ, Kafka, All." +
-                    " Default value: All");
-
     /** Parameter to indicate if it is a publisher or a subscriber */
     private final Option vegaConfigFilePath = new Option("f", "file", true,
             "Configuration file path");
@@ -39,7 +34,6 @@ class CommandLineParser
     {
         options.addOption(this.vegaConfigFilePath);
         options.addOption(this.clientType);
-        options.addOption(this.testType);
     }
 
     /**
@@ -76,10 +70,9 @@ class CommandLineParser
     private LaunchParameters parseAndValidateCommandLine() throws GenericAeronVegaException {
         final String configFilePath = this.getCmdStringOption(this.vegaConfigFilePath);
         final String clientType = this.getCmdStringOption(this.clientType);
-        final String testType = this.getCmdStringOption(this.testType);
 
         // Validate the parameters
-        return new LaunchParameters(configFilePath, clientType, testType);
+        return new LaunchParameters(configFilePath, clientType);
     }
 
     /**
