@@ -1,6 +1,7 @@
 package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
 
 import java.nio.ByteBuffer;
+import java.util.stream.Stream;
 
 import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
@@ -19,18 +20,23 @@ import org.agrona.concurrent.UnsafeBuffer;
 public class Publisher implements IClient {
 
     /** Time to wait to set up channels */
-    private static int TIME_TO_SET_UP_CHANNELS = 5000;
+    private static final int TIME_TO_SET_UP_CHANNELS = 5000;
+
+    private long lastBackPresure = 0;
+
+    private int numBackPresure = 0;
 
     /** The reused buffer */
     private UnsafeBuffer sendBuffer;
 
-    //TODO: PASAR A PARAM Numero de mensajes enviados en total
-    private static int TOTAL_MESSAGES_TO_SENT = 1024;
 
-    /** Integer to create an unique ID for each message */
-    private int messageId = 0;
-    /** Messages lost */
-    private int errorMsgs = 0;
+    //TODO: PASAR A PARAM Numero de mensajes enviados en total
+    // Un int son 4 bytes
+    // Un Mega: 1048576
+    //private static int TOTAL_MESSAGES_TO_SENT = 1_048_576; // 4 x 1 Mb
+    //private static int TOTAL_MESSAGES_TO_SENT = 10_485_760; // 4 x 10 Mb
+    private static int TOTAL_MESSAGES_TO_SENT = 105_000_000; // 4 x 100 Mb
+
     /** Messages sent */
     private int sentMsgs = 0;
     /** The checksum is the sum of all the messageId published */
@@ -39,8 +45,8 @@ public class Publisher implements IClient {
     /**
      * Publish the desired integers
      * @param instance Vega Instance
-     * @throws VegaException VegaException
-     * @throws InterruptedException InterruptedException
+     * @throws VegaException Vega Exception
+     * @throws InterruptedException Interrupted Exception
      */
     public void run (final IVegaInstance instance)
             throws VegaException, InterruptedException {
@@ -51,31 +57,30 @@ public class Publisher implements IClient {
         ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
 
         // Waiting for the Aeron channels to be established.
-        log.info("Waiting for channels set up");
         Thread.sleep(TIME_TO_SET_UP_CHANNELS);
 
-        log.info("Start Vega Test: Publishing data. Sending {} integers", TIME_TO_SET_UP_CHANNELS);
+        log.info("Start Vega Test: Publishing data. Sending {} integers", TOTAL_MESSAGES_TO_SENT);
 
         // Take the starting time
         long startTime = System.currentTimeMillis();
-        long startNanoTime = System.nanoTime();
 
-        for(int i = 0; i < TOTAL_MESSAGES_TO_SENT; i++) {
-            sendMsg(topicPublisher, false);
-        }
+        Stream.iterate(1,                   // start
+                n -> n < TOTAL_MESSAGES_TO_SENT,// Predicate to finish
+                n -> n + 1                      // Increment
+        ).forEach( id -> sendMsg(topicPublisher, id) );
 
         // Take the duration
-        long endTime = System.currentTimeMillis() - startTime;
-        long endNanoTime = System.nanoTime() - startNanoTime;
+        long durationTime = System.currentTimeMillis() - startTime;
 
         log.info("Finnished Vega Test: Stopping Publisher");
 
-        sendMsg(topicPublisher, true);
+        Thread.sleep(500);
+        sendMsg(topicPublisher, Constants.CLOSE_ID);
 
-        log.info("****** Finnished publisher test with sendedMsgs={} and errorMsgs={}." +
-                " Checksum={} ******",sentMsgs, errorMsgs, checksum);
+        log.info("****** Finnished publisher test with sentMsgs={}." +
+                " Checksum={}, numBackPresure={} ******",sentMsgs, checksum, numBackPresure);
 
-        log.info("****** Duration endTime={}ms and endNanoTime={}ns ******",endTime, endNanoTime);
+        log.info("****** Duration endTime={}ms ******\n\n", durationTime);
 
     }
 
@@ -83,27 +88,36 @@ public class Publisher implements IClient {
      * Method to send a message and save it into the messages structure
      * @param topicPublisher topicPublisher
      */
-    private void sendMsg(ITopicPublisher topicPublisher, boolean close) {
+    private void sendMsg(ITopicPublisher topicPublisher, int messageId) {
 
-        // Create the message to send
-        if(close) {
-            messageId = Constants.CLOSE_ID;
-        }
-        else {
-            checksum += messageId;
-        }
         // Prepare and send the message
         sendBuffer.putInt(0, messageId);
         PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, 4);
 
-        // Increase the data
-        messageId++;
-
         if (result == PublishResult.BACK_PRESSURED || result == PublishResult.UNEXPECTED_ERROR) {
-            errorMsgs++;
+            try {
+                long fromLastBackPresure = System.currentTimeMillis() - lastBackPresure + 1;
+                long timeToSleep = 1000 / fromLastBackPresure;
+                log.info("{}. Wait and resend {}... Time from last back presure: {}. Sleeping {}",
+                        result, messageId, fromLastBackPresure, timeToSleep);
+
+                // TODO Crear FlowControl class
+                numBackPresure++;
+                Thread.sleep(timeToSleep);
+                lastBackPresure = System.currentTimeMillis();
+
+                sendMsg(topicPublisher, messageId);
+            } catch (InterruptedException e) {
+                log.error("Unexpected ERROR. Finishing the test", e);
+                System.exit(1);
+            }
         }
         else {
             sentMsgs++;
+            // Create the message to send
+            if(messageId != Constants.CLOSE_ID) {
+                checksum += messageId;
+            }
         }
 
     }

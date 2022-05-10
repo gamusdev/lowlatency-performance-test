@@ -44,11 +44,11 @@ public class Subscriber implements IClient {
                 receivedMsgs.getAndIncrement();
 
                 // Get the offset of the message in the buffer
-                int msgOffset = receivedMessage.getContentOffset();
+                final int msgOffset = receivedMessage.getContentOffset();
 
                 // In this case, the received value will not been save, soo, it is not necessary to
                 // allocate a new ByteBuffer. It is used the unsafeBuffer directly
-                int receivedId = receivedMessage.getContents().getInt(msgOffset, ByteOrder.nativeOrder());
+                final int receivedId = receivedMessage.getContents().getInt(msgOffset, ByteOrder.nativeOrder());
 
                 if(receivedId == Constants.CLOSE_ID) {
                     close=true;
@@ -71,26 +71,23 @@ public class Subscriber implements IClient {
 
             // Start time
             long startTime = 0;
-            long startNanoTime = 0;
 
             while(!close) {
                 // If the first message is received, take the startTime
-                if (receivedMsgs.get() == 1 && startTime == 0) {
+                if (receivedMsgs.get() > 1 && startTime == 0) {
                     startTime = System.currentTimeMillis();
-                    startNanoTime = System.nanoTime();
                 }
 
                 Thread.sleep(1);
             }
 
             // Take the duration
-            long endTime = System.currentTimeMillis() - startTime;
-            long endNanoTime = System.nanoTime() - startNanoTime;
+            final long durationTime = System.currentTimeMillis() - startTime;
 
             log.info("****** Finnished publisher test with receivedMsgs={}." +
                     " Checksum={} ******",receivedMsgs, checksum);
 
-            log.info("****** Duration endTime={}ms and endNanoTime={}ns ******",endTime, endNanoTime);
+            log.info("****** Duration endTime={}ms ******\n\n", durationTime);
 
         }
         catch (InterruptedException e) {
