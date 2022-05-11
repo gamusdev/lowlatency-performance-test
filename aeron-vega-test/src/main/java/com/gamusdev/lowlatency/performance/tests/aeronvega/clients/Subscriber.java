@@ -31,7 +31,7 @@ public class Subscriber implements IClient {
     private final AtomicInteger receivedCounter = new AtomicInteger();
 
     /** Flag to warmUp */
-    private AtomicBoolean warmUpFlag = new AtomicBoolean(true);
+    private final AtomicBoolean warmUpFlag = new AtomicBoolean(true);
 
     /** Flag to close */
     private boolean closeFlag;
@@ -73,8 +73,10 @@ public class Subscriber implements IClient {
 
                 // Increment the received messages & test if this message is the last for warming up
                 if (receivedCounter.incrementAndGet() == WARN_UP_MESSAGES
-                        &&  warmUpFlag.getAndSet(false)  ) {
+                        &&  warmUpFlag.getAndSet(false) ) {
+
                     log.info("****** Finished Vega warm up ******");
+
                     // clean counters
                     cleanCounters();
                 }
@@ -84,6 +86,7 @@ public class Subscriber implements IClient {
             public void onRequestReceived(IRcvRequest receivedRequest) {
                 // Is not used in the test
             }
+
         };
     }
 
@@ -99,7 +102,7 @@ public class Subscriber implements IClient {
         // Wait until the close signal is received
         while(!closeFlag) {
             // If the first message is received, take the startTime.
-            if (receivedCounter.get() > 1 && startTime == 0 && warmUpFlag.get() == false) {
+            if (receivedCounter.get() > 1 && startTime == 0 && !warmUpFlag.get()) {
                 startTime = System.currentTimeMillis();
             }
 
