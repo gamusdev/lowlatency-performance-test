@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.utils;
 
 import com.bbva.kyof.vega.msg.PublishResult;
 import lombok.extern.slf4j.Slf4j;

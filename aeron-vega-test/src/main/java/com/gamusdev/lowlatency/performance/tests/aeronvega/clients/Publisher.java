@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 import java.nio.ByteBuffer;
 import java.util.stream.Stream;
@@ -7,8 +7,10 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientType;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.Constants;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientTypeEnum;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.BackPressureManager;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.UnsafeBuffer;
 
@@ -78,7 +80,7 @@ public class Publisher implements IClient {
 
         // return the results
         return TestResults.builder()
-                .clientType(ClientType.PUB).
+                .clientTypeEnum(ClientTypeEnum.PUB).
                 totalMessages(sizeTest)
                 .duration(durationTime)
                 .checksum(checksum)

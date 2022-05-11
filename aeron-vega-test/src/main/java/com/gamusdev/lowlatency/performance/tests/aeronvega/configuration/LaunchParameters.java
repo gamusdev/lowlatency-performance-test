@@ -20,7 +20,7 @@ public class LaunchParameters {
 
     /** Parameter indicating the selected client type (PUB or SUB) */
     @Getter
-    private ClientType clientType = ClientType.SUB;
+    private ClientTypeEnum clientTypeEnum = ClientTypeEnum.SUB;
 
     /** Vega configuration XML file path */
     @Getter
@@ -40,8 +40,8 @@ public class LaunchParameters {
             throws GenericAeronVegaException {
 
         // Check if client type is given and valid. If yes, replace the value
-        if (EnumUtils.isValidEnumIgnoreCase(ClientType.class, pClientType)) {
-            this.clientType = ClientType.valueOf(pClientType.toUpperCase(Locale.ROOT));
+        if (EnumUtils.isValidEnumIgnoreCase(ClientTypeEnum.class, pClientType)) {
+            this.clientTypeEnum = ClientTypeEnum.valueOf(pClientType.toUpperCase(Locale.ROOT));
         }
 
         // Check if the vega config xml file exists

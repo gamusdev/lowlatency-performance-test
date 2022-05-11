@@ -1,6 +1,6 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.model;
 
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientType;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientTypeEnum;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -11,7 +11,7 @@ import lombok.ToString;
 public class TestResults {
 
     /** Client type*/
-    private final ClientType clientType;
+    private final ClientTypeEnum clientTypeEnum;
 
     /** Messages Sent */
     private final long totalMessages;

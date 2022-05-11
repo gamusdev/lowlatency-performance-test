@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.configuration;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.utils;
 
 public class Constants {
 

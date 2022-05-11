@@ -5,6 +5,7 @@ import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchParameters;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class VegaExecutor {
             final IVegaInstance instance = VegaInstance.createNewInstance(params);
 
             // Execute the test (PUB -> Publisher, SUB -> Subscriber)
-            testResults = FactoryClient.getInstance(launchParameters.getClientType())
+            testResults = ClientFactory.getInstance(launchParameters.getClientTypeEnum())
                     .run(instance, launchParameters.getSizeTest());
 
             // Once finnished, close the Vega instance

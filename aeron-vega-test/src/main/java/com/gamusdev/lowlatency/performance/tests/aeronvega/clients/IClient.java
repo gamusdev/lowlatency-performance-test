@@ -1,7 +1,8 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 
 /**
  * Interface to define a Client Vega Instance

@@ -1,12 +1,13 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.IRcvMessage;
 import com.bbva.kyof.vega.msg.IRcvRequest;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.subscriber.ITopicSubListener;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientType;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.Constants;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientTypeEnum;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteOrder;
@@ -113,7 +114,7 @@ public class Subscriber implements IClient {
 
         // Return the results
         return TestResults.builder()
-                .clientType(ClientType.SUB)
+                .clientTypeEnum(ClientTypeEnum.SUB)
                 .totalMessages(receivedMsgs.get())
                 .duration(durationTime)
                 .checksum(checksum.get())
