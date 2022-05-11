@@ -7,7 +7,6 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientTypeEnum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.BackPressureManager;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
@@ -22,8 +21,11 @@ import org.agrona.concurrent.UnsafeBuffer;
 @Slf4j
 public class Publisher implements IClient {
 
+    /** Enum ClientType to indicate PUB (publisher) */
+    public final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.PUB;
+
     /** Time to wait to set up channels */
-    private static final int TIME_TO_SET_UP_CHANNELS = 5000;
+    private final static int TIME_TO_WAIT = 3000;
 
     /** The reused buffer */
     private final UnsafeBuffer sendBuffer;
@@ -49,10 +51,40 @@ public class Publisher implements IClient {
         // Subscribe to topic as publisher
         ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
 
-        // Waiting for the Aeron channels to be established.
-        Thread.sleep(TIME_TO_SET_UP_CHANNELS);
+        // Waiting for the channels to be established.
+        Thread.sleep(TIME_TO_WAIT);
 
         return topicPublisher;
+    }
+
+    /**
+     * Method to clear all counters and checksum
+     */
+    private void cleanCounters() {
+        checksum = 0;
+    }
+
+    /**
+     * When starts, the JVN creates some optimizations, but it needs some training.
+     * Number of messages sent to warn up the JVM.
+     * The purpose of this method is to train the JVM
+     * */
+    private void warnUpJVM(ITopicPublisher topicPublisher) throws InterruptedException {
+        log.info("****** Start Vega warm up ******");
+
+        // Send the training messages
+        Stream.iterate(1,                   // start
+                n -> n <= WARN_UP_MESSAGES,// Predicate to finish
+                n -> n + 1                      // Increment
+        ).forEach( id -> sendMsg(topicPublisher, id) );
+
+        // Initialize the counters
+        cleanCounters();
+
+        log.info("****** Finished Vega warm up ******");
+
+        // Give some time to the receiver to consume the warm messages
+        Thread.sleep(TIME_TO_WAIT);
     }
 
     /**
@@ -68,20 +100,20 @@ public class Publisher implements IClient {
         // Take the starting time
         long startTime = System.currentTimeMillis();
 
+        // Send the test messages
         Stream.iterate(1,                   // start
-                n -> n < sizeTest,// Predicate to finish
+                n -> n <= sizeTest,// Predicate to finish
                 n -> n + 1                      // Increment
         ).forEach( id -> sendMsg(topicPublisher, id) );
 
         // Take the duration
         long durationTime = System.currentTimeMillis() - startTime;
 
-        log.info("****** Finnished Vega Test: Duration endTime={}ms ******", durationTime);
+        log.info("****** Finished Vega Test: Duration endTime={}ms ******", durationTime);
 
         // return the results
         return TestResults.builder()
-                .clientTypeEnum(ClientTypeEnum.PUB).
-                totalMessages(sizeTest)
+                .totalMessages(sizeTest)
                 .duration(durationTime)
                 .checksum(checksum)
                 .build();
@@ -102,8 +134,8 @@ public class Publisher implements IClient {
             //Resend the message
             sendMsg(topicPublisher, messageId);
         }
-        else if(messageId != Constants.CLOSE_ID) {
-            // Add the Id to the checksum
+        else if(messageId != CLOSE_ID) {
+            // Add the id to the checksum
             checksum += messageId;
         }
 
@@ -116,7 +148,7 @@ public class Publisher implements IClient {
     private void close(ITopicPublisher topicPublisher) throws InterruptedException {
         // Take some time to avoid Back Pressure and send the signal to close the channel
         Thread.sleep(500);
-        sendMsg(topicPublisher, Constants.CLOSE_ID);
+        sendMsg(topicPublisher, CLOSE_ID);
     }
 
     /**
@@ -131,6 +163,8 @@ public class Publisher implements IClient {
 
         // Create the channel
         ITopicPublisher topicPublisher = createChannels(instance);
+
+        warnUpJVM(topicPublisher);
 
         // Execute the tests
         var testResults = executeTest(topicPublisher, sizeTest);

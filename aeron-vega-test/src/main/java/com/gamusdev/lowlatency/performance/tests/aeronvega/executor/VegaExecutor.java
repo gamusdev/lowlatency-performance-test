@@ -43,7 +43,8 @@ public class VegaExecutor {
             final IVegaInstance instance = VegaInstance.createNewInstance(params);
 
             // Execute the test (PUB -> Publisher, SUB -> Subscriber)
-            testResults = ClientFactory.getInstance(launchParameters.getClientTypeEnum())
+            testResults = new ClientFactory()
+                    .getInstance(launchParameters.getClientTypeEnum())
                     .run(instance, launchParameters.getSizeTest());
 
             // Once finnished, close the Vega instance
@@ -63,8 +64,8 @@ public class VegaExecutor {
      * @param testResults the results to print
      */
     private static void printResults(TestResults testResults) {
-        log.info("************************************************************************");
+        log.info("******************************************************************************************************");
         log.info(testResults.toString());
-        log.info("************************************************************************");
+        log.info("******************************************************************************************************");
     }
 }

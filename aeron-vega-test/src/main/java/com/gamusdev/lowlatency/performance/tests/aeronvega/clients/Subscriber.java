@@ -5,12 +5,12 @@ import com.bbva.kyof.vega.msg.IRcvMessage;
 import com.bbva.kyof.vega.msg.IRcvRequest;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.subscriber.ITopicSubListener;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientTypeEnum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteOrder;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -21,14 +21,28 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class Subscriber implements IClient {
 
+    /** Enum ClientType to indicate SUB (subscriber) */
+    public final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.SUB;
+
     /** The checksum is the sum of all the messageId published */
-    private AtomicLong checksum = new AtomicLong();
+    private final AtomicLong checksum = new AtomicLong();
 
     /** Messages received */
-    private AtomicInteger receivedMsgs = new AtomicInteger();
+    private final AtomicInteger receivedCounter = new AtomicInteger();
+
+    /** Flag to warmUp */
+    private AtomicBoolean warmUpFlag = new AtomicBoolean(true);
 
     /** Flag to close */
-    boolean close;
+    private boolean closeFlag;
+
+    /**
+     * Method to clear all counters and checksum
+     */
+    private void cleanCounters() {
+        checksum.set(0);
+        receivedCounter.set(0);
+    }
 
     /**
      * Create the listener
@@ -40,28 +54,35 @@ public class Subscriber implements IClient {
             @Override
             public void onMessageReceived(IRcvMessage receivedMessage)
             {
-                // Increment the received messages
-                receivedMsgs.getAndIncrement();
 
                 // Get the offset of the message in the buffer
                 final int msgOffset = receivedMessage.getContentOffset();
 
-                // In this case, the received value will not been save, soo, it is not necessary to
+                // In this case, the received value will not been safe, soo, it is not necessary to
                 // allocate a new ByteBuffer. It is used the unsafeBuffer directly
                 final int receivedId = receivedMessage.getContents().getInt(msgOffset, ByteOrder.nativeOrder());
 
-                // If close signal received, active close flag
-                if(receivedId == Constants.CLOSE_ID) {
-                    close=true;
+                // If close signal received, active close flag & exit
+                if(receivedId == CLOSE_ID) {
+                    closeFlag=true;
+                    return;
                 }
                 else {
                     checksum.addAndGet(receivedId);
+                }
+
+                // Increment the received messages & test if this message is the last for warming up
+                if (receivedCounter.incrementAndGet() == WARN_UP_MESSAGES
+                        &&  warmUpFlag.getAndSet(false)  ) {
+                    log.info("****** Finished Vega warm up ******");
+                    // clean counters
+                    cleanCounters();
                 }
             }
 
             @Override
             public void onRequestReceived(IRcvRequest receivedRequest) {
-                // Do not used in the test
+                // Is not used in the test
             }
         };
     }
@@ -76,9 +97,9 @@ public class Subscriber implements IClient {
         long startTime = 0;
 
         // Wait until the close signal is received
-        while(!close) {
+        while(!closeFlag) {
             // If the first message is received, take the startTime.
-            if (receivedMsgs.get() > 1 && startTime == 0) {
+            if (receivedCounter.get() > 1 && startTime == 0 && warmUpFlag.get() == false) {
                 startTime = System.currentTimeMillis();
             }
 
@@ -106,16 +127,15 @@ public class Subscriber implements IClient {
 
         final long durationTime = executeTest();
 
-        if ( sizeTest != receivedMsgs.get()) {
-            log.info("########################################################################");
-            log.error("ERROR: Some messages were lost! sizeTest: {}, receivedMsgs: {}", sizeTest, receivedMsgs.get());
-            log.info("########################################################################");
+        if ( sizeTest != receivedCounter.get()) {
+            log.info("###########################################################################################");
+            log.error("ERROR: Some messages were lost! size of the test: {}, received messages: {}", sizeTest, receivedCounter.get());
+            log.info("###########################################################################################");
         }
 
         // Return the results
         return TestResults.builder()
-                .clientTypeEnum(ClientTypeEnum.SUB)
-                .totalMessages(receivedMsgs.get())
+                .totalMessages(receivedCounter.get())
                 .duration(durationTime)
                 .checksum(checksum.get())
                 .build();
