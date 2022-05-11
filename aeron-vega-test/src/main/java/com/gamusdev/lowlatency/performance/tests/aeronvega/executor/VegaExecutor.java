@@ -8,6 +8,7 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchP
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Map;
 
 
 /**
@@ -30,22 +31,30 @@ public class VegaExecutor {
                 instanceName(INSTANCE_NAME).
                 configurationFile(launchParameters.getVegaConfigFilePath()).build();
 
+        final TestResults testResults;
         try {
             // Create the Vega new instance
             final IVegaInstance instance = VegaInstance.createNewInstance(params);
 
             // Execute the test (PUB -> Publisher, SUB -> Subscriber)
-            FactoryClient.getInstance(launchParameters.getClientType())
-                    .run(instance);
+            testResults = FactoryClient.getInstance(launchParameters.getClientType())
+                    .run(instance, launchParameters.getSizeTest());
 
             // Once finnished, close the Vega instance
             instance.close();
 
-        } catch (VegaException | IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+            // Print the results
+            printResults( testResults );
 
+        } catch (VegaException | IOException | InterruptedException e) {
+            log.error("Error ", e);
+        }
 
     }
 
+    private static void printResults(TestResults testResults) {
+        log.info("************************************************************************");
+        log.info(testResults.toString());
+        log.info("************************************************************************");
+    }
 }

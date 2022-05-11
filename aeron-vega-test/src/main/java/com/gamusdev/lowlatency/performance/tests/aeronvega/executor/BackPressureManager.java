@@ -3,7 +3,6 @@ package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
 import com.bbva.kyof.vega.msg.PublishResult;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**

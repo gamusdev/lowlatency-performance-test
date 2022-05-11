@@ -33,7 +33,7 @@ public class Subscriber implements IClient {
      * @param instance Vega Instance
      * @throws VegaException VegaException
      */
-    public void run(final IVegaInstance instance) throws VegaException {
+    public TestResults run(final IVegaInstance instance, int sizeTest) throws VegaException {
 
         // Create a listener
         ITopicSubListener listener = new ITopicSubListener()
@@ -93,8 +93,11 @@ public class Subscriber implements IClient {
 
         }
         catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error("Error ", e);
         }
+
+        // Return the results
+        return TestResults.builder().build();
     }
 
 }

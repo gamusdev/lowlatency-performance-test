@@ -7,6 +7,7 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientType;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.UnsafeBuffer;
@@ -23,61 +24,62 @@ public class Publisher implements IClient {
     private static final int TIME_TO_SET_UP_CHANNELS = 5000;
 
     /** The reused buffer */
-    private UnsafeBuffer sendBuffer;
+    private final UnsafeBuffer sendBuffer;
 
-
-    //TODO: PASAR A PARAM Numero de mensajes enviados en total
-    // Un int son 4 bytes
-    // Un Mega: 1048576
-    //private static int TOTAL_MESSAGES_TO_SENT = 1_048_576; // 4 x 1 Mb
-    //private static int TOTAL_MESSAGES_TO_SENT = 10_485_760; // 4 x 10 Mb
-    private static int TOTAL_MESSAGES_TO_SENT = 105_000_000; // 4 x 100 Mb
-
-    /** Messages sent */
-    private int sentMsgs = 0;
     /** The checksum is the sum of all the messageId published */
     private long checksum = 0;
 
     /**
-     * Publish the desired integers
-     * @param instance Vega Instance
-     * @throws VegaException Vega Exception
-     * @throws InterruptedException Interrupted Exception
+     * Constructor
      */
-    public void run (final IVegaInstance instance)
-            throws VegaException, InterruptedException {
-        // Initialize the buffer
-        sendBuffer = new UnsafeBuffer(ByteBuffer.allocate(128));
+    public Publisher() {
+        super();
 
-        // Subscribe to topics
+        // Initialize the buffer
+        sendBuffer = new UnsafeBuffer(ByteBuffer.allocate(4));
+    }
+
+    /**
+     * Establish the publisher channel
+     */
+    private ITopicPublisher createChannels(final IVegaInstance instance)
+            throws VegaException, InterruptedException  {
+        // Subscribe to topic as publisher
         ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
 
         // Waiting for the Aeron channels to be established.
         Thread.sleep(TIME_TO_SET_UP_CHANNELS);
 
-        log.info("Start Vega Test: Publishing data. Sending {} integers", TOTAL_MESSAGES_TO_SENT);
+        return topicPublisher;
+    }
+
+    /**
+     *
+     */
+    private TestResults executeTest(ITopicPublisher topicPublisher, int sizeTest) {
+
+        log.info("****** Start Vega Test: Publishing data. Sending {} integers ******", sizeTest);
 
         // Take the starting time
         long startTime = System.currentTimeMillis();
 
         Stream.iterate(1,                   // start
-                n -> n < TOTAL_MESSAGES_TO_SENT,// Predicate to finish
+                n -> n < sizeTest,// Predicate to finish
                 n -> n + 1                      // Increment
         ).forEach( id -> sendMsg(topicPublisher, id) );
 
         // Take the duration
         long durationTime = System.currentTimeMillis() - startTime;
 
-        log.info("Finnished Vega Test: Stopping Publisher");
+        log.info("****** Finnished Vega Test: Duration endTime={}ms ******", durationTime);
 
-        Thread.sleep(500);
-        sendMsg(topicPublisher, Constants.CLOSE_ID);
-
-        log.info("****** Finnished publisher test with sentMsgs={}." +
-                " Checksum={}, numBackPresure={} ******",sentMsgs, checksum);
-
-        log.info("****** Duration endTime={}ms ******\n\n", durationTime);
-
+        // return the results
+        return TestResults.builder()
+                .clientType(ClientType.PUB).
+                totalMessages(sizeTest)
+                .duration(durationTime)
+                .checksum(checksum)
+                .build();
     }
 
     /**
@@ -93,17 +95,45 @@ public class Publisher implements IClient {
         // Check if we have back pressure
         if (BackPressureManager.checkAndControl(result)) {
             //Resend the message
-            log.info("{}. Resend {}", result, messageId);
             sendMsg(topicPublisher, messageId);
         }
-        else {
-            sentMsgs++;
-            // Create the message to send
-            if(messageId != Constants.CLOSE_ID) {
-                checksum += messageId;
-            }
+        else if(messageId != Constants.CLOSE_ID) {
+            // Add the Id to the checksum
+            checksum += messageId;
         }
 
+    }
+
+    /**
+     * Close the channel.
+     * To close, a signal is sent.
+     */
+    private void close(ITopicPublisher topicPublisher) throws InterruptedException {
+        // Take some time to avoid Back Pressure and send the signal to close the channel
+        Thread.sleep(500);
+        sendMsg(topicPublisher, Constants.CLOSE_ID);
+    }
+
+    /**
+     * Publish the desired integers
+     * @param instance Vega Instance
+     * @param sizeTest Number of messages to send in the test
+     * @throws VegaException Vega Exception
+     * @throws InterruptedException Interrupted Exception
+     */
+    public TestResults run (final IVegaInstance instance, int sizeTest)
+            throws VegaException, InterruptedException {
+
+        // Create the channel
+        ITopicPublisher topicPublisher = createChannels(instance);
+
+        // Execute the tests
+        var testResults = executeTest(topicPublisher, sizeTest);
+
+        // Close the channels.
+        close(topicPublisher);
+
+        return testResults;
     }
 
 }
