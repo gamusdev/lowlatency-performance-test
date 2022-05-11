@@ -5,6 +5,7 @@ import com.bbva.kyof.vega.msg.IRcvMessage;
 import com.bbva.kyof.vega.msg.IRcvRequest;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.subscriber.ITopicSubListener;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.ClientType;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.Constants;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,14 +30,11 @@ public class Subscriber implements IClient {
     boolean close;
 
     /**
-     * Subscribe to the topic and receive the integers
-     * @param instance Vega Instance
-     * @throws VegaException VegaException
+     * Create the listener
+     * @return the listener created
      */
-    public TestResults run(final IVegaInstance instance, int sizeTest) throws VegaException {
-
-        // Create a listener
-        ITopicSubListener listener = new ITopicSubListener()
+    private ITopicSubListener getListener() {
+        return new ITopicSubListener()
         {
             @Override
             public void onMessageReceived(IRcvMessage receivedMessage)
@@ -65,39 +63,61 @@ public class Subscriber implements IClient {
                 // Do not used in the test
             }
         };
+    }
 
-        try
-        {
-            // Subscribe to the topic
-            instance.subscribeToTopic(Constants.TOPIC_NAME, listener);
+    /**
+     * Execute the test
+     * Wait until the all the messages are received and return the duration of the test
+     * @return the duration of the test
+     */
+    private long executeTest() throws InterruptedException {
+        // Start time
+        long startTime = 0;
 
-            // Start time
-            long startTime = 0;
-
-            while(!close) {
-                // If the first message is received, take the startTime.
-                if (receivedMsgs.get() > 1 && startTime == 0) {
-                    startTime = System.currentTimeMillis();
-                }
-
-                Thread.sleep(1);
+        // Wait until the close signal is received
+        while(!close) {
+            // If the first message is received, take the startTime.
+            if (receivedMsgs.get() > 1 && startTime == 0) {
+                startTime = System.currentTimeMillis();
             }
 
-            // Take the duration
-            final long durationTime = System.currentTimeMillis() - startTime;
-
-            log.info("****** Finnished publisher test with receivedMsgs={}." +
-                    " Checksum={} ******",receivedMsgs, checksum);
-
-            log.info("****** Duration endTime={}ms ******\n\n", durationTime);
-
+            Thread.sleep(1);
         }
-        catch (InterruptedException e) {
-            log.error("Error ", e);
+
+        // Take the duration
+        return System.currentTimeMillis() - startTime;
+    }
+
+    /**
+     * Subscribe to the topic and receive the integers
+     * @param instance Vega Instance
+     * @throws VegaException Vega Exception
+     * @throws InterruptedException Interrupted Exception
+     */
+    public TestResults run(final IVegaInstance instance, int sizeTest)
+            throws VegaException, InterruptedException {
+
+        // Create a listener
+        ITopicSubListener listener = getListener();
+
+        // Subscribe the listener to the topic
+        instance.subscribeToTopic(Constants.TOPIC_NAME, listener);
+
+        final long durationTime = executeTest();
+
+        if ( sizeTest != receivedMsgs.get()) {
+            log.info("########################################################################");
+            log.error("ERROR: Some messages were lost! sizeTest: {}, receivedMsgs: {}", sizeTest, receivedMsgs.get());
+            log.info("########################################################################");
         }
 
         // Return the results
-        return TestResults.builder().build();
+        return TestResults.builder()
+                .clientType(ClientType.SUB)
+                .totalMessages(receivedMsgs.get())
+                .duration(durationTime)
+                .checksum(checksum.get())
+                .build();
     }
 
 }

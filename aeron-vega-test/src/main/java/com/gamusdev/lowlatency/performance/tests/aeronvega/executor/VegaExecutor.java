@@ -8,20 +8,25 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchP
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.Map;
 
 
 /**
  * The Executor Class initializes the instances and launch the test.
- * 1) Creates the Vega Instance
- * 2) Initialices the data
- * 3) Creates and launch the publisher (PUB) or subscriber (SUB)
+ * - Creates the Vega Instance
+ * - Creates and launch the publisher (PUB) or subscriber (SUB) and launch the client
+ * - Close the Vega instance when finished.
+ * - Finally, print the results
  */
 @Slf4j
 public class VegaExecutor {
 
+    /** Instance name*/
     private static final String INSTANCE_NAME = "TestInstance";
 
+    /**
+     * Execute the test with the received params
+     * @param launchParameters The given parameters
+     */
     public static void executeTest(LaunchParameters launchParameters) {
 
         log.info("Launching VegaExecutor with parameters [{}]", launchParameters);
@@ -52,6 +57,10 @@ public class VegaExecutor {
 
     }
 
+    /**
+     * Print the results
+     * @param testResults the results to print
+     */
     private static void printResults(TestResults testResults) {
         log.info("************************************************************************");
         log.info(testResults.toString());

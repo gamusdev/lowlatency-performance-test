@@ -54,7 +54,10 @@ public class Publisher implements IClient {
     }
 
     /**
-     *
+     * Execute the test
+     * @param topicPublisher the topicPublisher where send the messages
+     * @param sizeTest the number of messages to send in the test
+     * @return TestResults with the results
      */
     private TestResults executeTest(ITopicPublisher topicPublisher, int sizeTest) {
 
