@@ -21,7 +21,11 @@ public class ClientFactory {
                     Map.entry(ClientTypeEnum.SUB, new Subscriber())
             );
 
-    /** Factory method */
+    /**
+     * Factory method that creates an instance of the desired client
+     * @param testType ClientTypeEnum.PUB or ClientTypeEnum.SUB
+     * @return the instance of the desired type
+     */
     public static IClient getInstance(final ClientTypeEnum testType){
         return clientsMap.get(testType);
     }
