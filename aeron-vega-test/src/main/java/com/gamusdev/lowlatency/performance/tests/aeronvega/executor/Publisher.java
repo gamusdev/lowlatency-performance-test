@@ -22,10 +22,6 @@ public class Publisher implements IClient {
     /** Time to wait to set up channels */
     private static final int TIME_TO_SET_UP_CHANNELS = 5000;
 
-    private long lastBackPresure = 0;
-
-    private int numBackPresure = 0;
-
     /** The reused buffer */
     private UnsafeBuffer sendBuffer;
 
@@ -78,7 +74,7 @@ public class Publisher implements IClient {
         sendMsg(topicPublisher, Constants.CLOSE_ID);
 
         log.info("****** Finnished publisher test with sentMsgs={}." +
-                " Checksum={}, numBackPresure={} ******",sentMsgs, checksum, numBackPresure);
+                " Checksum={}, numBackPresure={} ******",sentMsgs, checksum);
 
         log.info("****** Duration endTime={}ms ******\n\n", durationTime);
 
@@ -94,23 +90,11 @@ public class Publisher implements IClient {
         sendBuffer.putInt(0, messageId);
         PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, 4);
 
-        if (result == PublishResult.BACK_PRESSURED || result == PublishResult.UNEXPECTED_ERROR) {
-            try {
-                long fromLastBackPresure = System.currentTimeMillis() - lastBackPresure + 1;
-                long timeToSleep = 1000 / fromLastBackPresure;
-                log.info("{}. Wait and resend {}... Time from last back presure: {}. Sleeping {}",
-                        result, messageId, fromLastBackPresure, timeToSleep);
-
-                // TODO Crear FlowControl class
-                numBackPresure++;
-                Thread.sleep(timeToSleep);
-                lastBackPresure = System.currentTimeMillis();
-
-                sendMsg(topicPublisher, messageId);
-            } catch (InterruptedException e) {
-                log.error("Unexpected ERROR. Finishing the test", e);
-                System.exit(1);
-            }
+        // Check if we have back pressure
+        if (BackPressureManager.checkAndControl(result)) {
+            //Resend the message
+            log.info("{}. Resend {}", result, messageId);
+            sendMsg(topicPublisher, messageId);
         }
         else {
             sentMsgs++;

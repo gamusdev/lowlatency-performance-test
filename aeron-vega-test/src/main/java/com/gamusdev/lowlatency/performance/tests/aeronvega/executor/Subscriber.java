@@ -41,6 +41,7 @@ public class Subscriber implements IClient {
             @Override
             public void onMessageReceived(IRcvMessage receivedMessage)
             {
+                // Increment the received messages
                 receivedMsgs.getAndIncrement();
 
                 // Get the offset of the message in the buffer
@@ -50,6 +51,7 @@ public class Subscriber implements IClient {
                 // allocate a new ByteBuffer. It is used the unsafeBuffer directly
                 final int receivedId = receivedMessage.getContents().getInt(msgOffset, ByteOrder.nativeOrder());
 
+                // If close signal received, active close flag
                 if(receivedId == Constants.CLOSE_ID) {
                     close=true;
                 }
@@ -73,7 +75,7 @@ public class Subscriber implements IClient {
             long startTime = 0;
 
             while(!close) {
-                // If the first message is received, take the startTime
+                // If the first message is received, take the startTime.
                 if (receivedMsgs.get() > 1 && startTime == 0) {
                     startTime = System.currentTimeMillis();
                 }
