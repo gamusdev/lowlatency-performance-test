@@ -22,6 +22,10 @@ class CommandLineParser
     private final Option vegaConfigFilePath = new Option("f", "file", true,
             "Configuration file path");
 
+    /** Parameter to indicate the number of messages sent / received in the test */
+    private final Option sizeTest = new Option("s", "size", true,
+            "Number of messages sent in this test");
+
     /** The command line with all the values parsed */
     private CommandLine commandLine = null;
 
@@ -34,6 +38,7 @@ class CommandLineParser
     {
         options.addOption(this.vegaConfigFilePath);
         options.addOption(this.clientType);
+        options.addOption(this.sizeTest);
     }
 
     /**
@@ -70,9 +75,10 @@ class CommandLineParser
     private LaunchParameters parseAndValidateCommandLine() throws GenericAeronVegaException {
         final String configFilePath = this.getCmdStringOption(this.vegaConfigFilePath);
         final String clientType = this.getCmdStringOption(this.clientType);
+        final String sizeTest = this.getCmdStringOption(this.sizeTest);
 
         // Validate the parameters
-        return new LaunchParameters(configFilePath, clientType);
+        return new LaunchParameters(configFilePath, clientType, sizeTest);
     }
 
     /**
