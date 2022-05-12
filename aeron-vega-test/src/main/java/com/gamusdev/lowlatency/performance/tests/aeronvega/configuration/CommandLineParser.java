@@ -1,6 +1,5 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.configuration;
 
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchParameters;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
@@ -9,7 +8,7 @@ import org.apache.commons.cli.*;
  * Parser for the command line arguments of the aeron-Vega-Test
  */
 @Slf4j
-class CommandLineParser
+public class CommandLineParser
 {
 
     /** Parameter to indicate if it is a publisher or a subscriber */
@@ -49,7 +48,7 @@ class CommandLineParser
      * @throws ParseException exception thrown if there is a problem reading or validating the command line
      * @throws GenericAeronVegaException if the configuration is not given
      */
-    LaunchParameters parseCommandLine(final String[] args)
+    public LaunchParameters parseCommandLine(final String[] args)
             throws ParseException, GenericAeronVegaException {
         log.info("Parsing Aeron-Vega-Test Launcher command line arguments: {}", (Object)args);
 

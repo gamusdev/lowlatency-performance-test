@@ -1,5 +1,6 @@
 package com.gamusdev.lowlatency.performance.tests.aeronvega.configuration;
 
+import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.IClient;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
 import lombok.Getter;
 import lombok.ToString;
@@ -20,7 +21,7 @@ public class LaunchParameters {
 
     /** Parameter indicating the selected client type (PUB or SUB) */
     @Getter
-    private ClientTypeEnum clientTypeEnum = ClientTypeEnum.SUB;
+    private IClient.ClientTypeEnum clientTypeEnum = IClient.ClientTypeEnum.SUB;
 
     /** Vega configuration XML file path */
     @Getter
@@ -40,8 +41,8 @@ public class LaunchParameters {
             throws GenericAeronVegaException {
 
         // Check if client type is given and valid. If yes, replace the value
-        if (EnumUtils.isValidEnumIgnoreCase(ClientTypeEnum.class, pClientType)) {
-            this.clientTypeEnum = ClientTypeEnum.valueOf(pClientType.toUpperCase(Locale.ROOT));
+        if (EnumUtils.isValidEnumIgnoreCase(IClient.ClientTypeEnum.class, pClientType)) {
+            this.clientTypeEnum = IClient.ClientTypeEnum.valueOf(pClientType.toUpperCase(Locale.ROOT));
         }
 
         // Check if the vega config xml file exists

@@ -10,6 +10,18 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 @FunctionalInterface
 public interface IClient {
 
+    /** Enum ClientType to indicate PUB (publisher) or SUB (subscriber) client type*/
+    enum ClientTypeEnum { PUB, SUB }
+
+    /** Signal to finish the test */
+    int CLOSE_ID = Integer.MAX_VALUE;
+
+    /**
+     * When starts, the JVN creates some optimizations, but it needs some training.
+     * Number of messages sent to warn up the JVM.
+     * */
+    int WARN_UP_MESSAGES = 1_000_000;
+
     /** Execute the client code
      *
      * @param instance Vega Instance
@@ -18,4 +30,5 @@ public interface IClient {
      * @throws InterruptedException Interrupted Exception
      */
     TestResults run (IVegaInstance instance, int sizeTest) throws VegaException, InterruptedException;
+
 }
