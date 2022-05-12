@@ -19,8 +19,6 @@
 
   <modules>
     <module>aeron-vega-test</module>
-    <module>tcp-test</module>
-    <module>udp-test</module>
     <module>rabbitmq-test</module>
     <module>kafka-test</module>
     <module>aws-test</module>

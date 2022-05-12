@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Factory class to return the required Executor
  */
-public class ClientFactory {
+public class ClientFactory implements IClientFactory{
 
     /** Strategy Pattern
      * Map with the relationship between TestType and test to execute.

@@ -4,9 +4,12 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.CommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchParameters;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 
@@ -19,16 +22,21 @@ import java.io.IOException;
  * - Finally, print the results
  */
 @Slf4j
-public class VegaExecutor {
+public class VegaTestExecutor implements ITestExecutor {
 
     /** Instance name*/
     private static final String INSTANCE_NAME = "TestInstance";
 
     /**
      * Execute the test with the received params
-     * @param launchParameters The given parameters
+     * @param args The given parameters
      */
-    public static void executeTest(LaunchParameters launchParameters) {
+    public void executeTest(String[] args)
+            throws ParseException, GenericAeronVegaException {
+
+        // Create a command line parser, parse and validate the parameters
+        final CommandLineParser parser = new CommandLineParser();
+        final LaunchParameters launchParameters = parser.parseCommandLine(args);
 
         log.info("Launching VegaExecutor with parameters [{}]", launchParameters);
 
