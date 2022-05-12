@@ -1,8 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.executor;
-
-import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.IClient;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.Publisher;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.Subscriber;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 import java.util.Map;
 

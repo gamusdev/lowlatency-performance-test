@@ -19,10 +19,10 @@ import org.agrona.concurrent.UnsafeBuffer;
  * The publisher is in one thread, no race conditions
  */
 @Slf4j
-public class Publisher implements IClient {
+class Publisher implements IClient {
 
     /** Enum ClientType to indicate PUB (publisher) */
-    public final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.PUB;
+    final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.PUB;
 
     /** Time to wait to set up channels */
     private final static int TIME_TO_WAIT = 3000;
@@ -36,7 +36,7 @@ public class Publisher implements IClient {
     /**
      * Constructor
      */
-    public Publisher() {
+    Publisher() {
         super();
 
         // Initialize the buffer

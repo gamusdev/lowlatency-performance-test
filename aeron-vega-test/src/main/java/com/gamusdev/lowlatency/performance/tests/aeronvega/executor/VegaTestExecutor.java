@@ -4,6 +4,7 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.ClientFactory;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.CommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchParameters;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;

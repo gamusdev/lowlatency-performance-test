@@ -19,10 +19,10 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class subscribe to the topic, and receives all the integers.
  */
 @Slf4j
-public class Subscriber implements IClient {
+class Subscriber implements IClient {
 
     /** Enum ClientType to indicate SUB (subscriber) */
-    public final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.SUB;
+    final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.SUB;
 
     /** The checksum is the sum of all the messageId published */
     private final AtomicLong checksum = new AtomicLong();
