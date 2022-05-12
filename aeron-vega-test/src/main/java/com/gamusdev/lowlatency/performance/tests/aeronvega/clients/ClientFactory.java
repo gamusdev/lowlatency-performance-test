@@ -4,10 +4,11 @@ import java.util.Map;
 
 /**
  * Factory class to return the required Executor
+ * Strategy Pattern
  */
 public class ClientFactory implements IClientFactory{
 
-    /** Strategy Pattern
+    /**
      * Map with the relationship between TestType and test to execute.
      */
     private Map<IClient.ClientTypeEnum, IClient> clientsMap =

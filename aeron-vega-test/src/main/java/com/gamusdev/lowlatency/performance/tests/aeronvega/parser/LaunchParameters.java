@@ -1,4 +1,4 @@
-package com.gamusdev.lowlatency.performance.tests.aeronvega.configuration;
+package com.gamusdev.lowlatency.performance.tests.aeronvega.parser;
 
 import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.IClient;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;

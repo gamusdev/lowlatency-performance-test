@@ -2,6 +2,7 @@ package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 /**
  * Interface to ClientFactory
+ * Factory pattern
  */
 @FunctionalInterface
 public interface IClientFactory {
