@@ -45,7 +45,8 @@ class Subscriber implements IClient {
     }
 
     /**
-     * Create the listener
+     * Create the listener.
+     * Vega executes the listener on other thread!
      * @return the listener created
      */
     private ITopicSubListener getListener() {
@@ -123,7 +124,7 @@ class Subscriber implements IClient {
             throws VegaException, InterruptedException {
 
         // Create a listener
-        ITopicSubListener listener = getListener();
+        final ITopicSubListener listener = getListener();
 
         // Subscribe the listener to the topic
         instance.subscribeToTopic(Constants.TOPIC_NAME, listener);
