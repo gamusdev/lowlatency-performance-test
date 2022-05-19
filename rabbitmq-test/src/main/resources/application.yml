@@ -1,0 +1,16 @@
+spring:
+  cloud:
+    function:
+      definition: onIntegersMeasuredConsumer;onIntegersMeasuredSupplier
+    stream:
+      bindings:
+        onIntegersMeasuredConsumer-in-0:
+          destination: integer/measured
+        onIntegersMeasuredSupplier-out-0:
+          destination: integer/measured
+logging:
+  level:
+    root: info
+    org:
+      springframework: info
+
