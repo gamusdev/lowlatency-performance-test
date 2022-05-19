@@ -7,7 +7,6 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 /**
  * Interface to define a Client Vega Instance
  */
-@FunctionalInterface
 public interface IClient {
 
     /** Enum ClientType to indicate PUB (publisher) or SUB (subscriber) client type*/
@@ -31,4 +30,9 @@ public interface IClient {
      */
     TestResults run (IVegaInstance instance, int sizeTest) throws VegaException, InterruptedException;
 
+    /**
+     * Returns the ClientTypeEnum of the service
+     * @return ClientTypeEnum of the service
+     */
+    ClientTypeEnum getClientType();
 }
