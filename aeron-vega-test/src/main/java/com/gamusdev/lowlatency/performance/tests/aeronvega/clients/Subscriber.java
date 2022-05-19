@@ -19,13 +19,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class subscribe to the topic, and receives all the integers.
  */
 @Slf4j
-class Subscriber implements IClient {
-
-    /** Enum ClientType to indicate SUB (subscriber) */
-    final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.SUB;
+public class Subscriber implements IClient {
 
     /** The checksum is the sum of all the messageId published */
     private final AtomicLong checksum = new AtomicLong();
+
+    /** Enum ClientType to indicate SUB (subscriber) */
+    private final ClientTypeEnum clientType = ClientTypeEnum.SUB;
 
     /** Messages received */
     private final AtomicInteger receivedCounter = new AtomicInteger();
@@ -45,7 +45,15 @@ class Subscriber implements IClient {
     }
 
     /**
-     * Create the listener
+     * Constructor
+     */
+    public Subscriber() {
+        super();
+    }
+
+    /**
+     * Create the listener.
+     * Vega executes the listener on other thread!
      * @return the listener created
      */
     private ITopicSubListener getListener() {
@@ -123,7 +131,7 @@ class Subscriber implements IClient {
             throws VegaException, InterruptedException {
 
         // Create a listener
-        ITopicSubListener listener = getListener();
+        final ITopicSubListener listener = getListener();
 
         // Subscribe the listener to the topic
         instance.subscribeToTopic(Constants.TOPIC_NAME, listener);
@@ -144,4 +152,7 @@ class Subscriber implements IClient {
                 .build();
     }
 
+    public ClientTypeEnum getClientType() {
+        return clientType;
+    }
 }

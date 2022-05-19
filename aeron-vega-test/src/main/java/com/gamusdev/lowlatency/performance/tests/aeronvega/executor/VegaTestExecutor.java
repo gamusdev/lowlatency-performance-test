@@ -5,8 +5,8 @@ import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.ClientFactory;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.CommandLineParser;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.configuration.LaunchParameters;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.VegaCommandLineParser;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.LaunchParameters;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class VegaTestExecutor implements ITestExecutor {
             throws ParseException, GenericAeronVegaException {
 
         // Create a command line parser, parse and validate the parameters
-        final CommandLineParser parser = new CommandLineParser();
+        final VegaCommandLineParser parser = new VegaCommandLineParser();
         final LaunchParameters launchParameters = parser.parseCommandLine(args);
 
         log.info("Launching VegaExecutor with parameters [{}]", launchParameters);
@@ -60,7 +60,7 @@ public class VegaTestExecutor implements ITestExecutor {
             instance.close();
 
             // Print the results
-            printResults( testResults );
+            printResults( log, testResults );
 
         } catch (VegaException | IOException | InterruptedException e) {
             log.error("Error ", e);
@@ -68,13 +68,5 @@ public class VegaTestExecutor implements ITestExecutor {
 
     }
 
-    /**
-     * Print the results
-     * @param testResults the results to print
-     */
-    private static void printResults(TestResults testResults) {
-        log.info("******************************************************************************************************");
-        log.info(testResults.toString());
-        log.info("******************************************************************************************************");
-    }
+
 }

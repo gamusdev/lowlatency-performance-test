@@ -19,13 +19,13 @@ import org.agrona.concurrent.UnsafeBuffer;
  * The publisher is in one thread, no race conditions
  */
 @Slf4j
-class Publisher implements IClient {
-
-    /** Enum ClientType to indicate PUB (publisher) */
-    final static ClientTypeEnum CLIENT_TYPE = ClientTypeEnum.PUB;
+public class Publisher implements IClient {
 
     /** Time to wait to set up channels */
     private final static int TIME_TO_WAIT = 3000;
+
+    /** Enum ClientType to indicate PUB (publisher) */
+    private final ClientTypeEnum clientType = ClientTypeEnum.PUB;
 
     /** The reused buffer */
     private final UnsafeBuffer sendBuffer;
@@ -36,7 +36,7 @@ class Publisher implements IClient {
     /**
      * Constructor
      */
-    Publisher() {
+    public Publisher() {
         super();
 
         // Initialize the buffer
@@ -49,7 +49,7 @@ class Publisher implements IClient {
     private ITopicPublisher createChannels(final IVegaInstance instance)
             throws VegaException, InterruptedException  {
         // Subscribe to topic as publisher
-        ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
+        final ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
 
         // Waiting for the channels to be established.
         Thread.sleep(TIME_TO_WAIT);
@@ -98,7 +98,7 @@ class Publisher implements IClient {
         log.info("****** Start Vega Test: Publishing data. Sending {} integers ******", sizeTest);
 
         // Take the starting time
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
 
         // Send the test messages
         Stream.iterate(1,                   // start
@@ -107,7 +107,7 @@ class Publisher implements IClient {
         ).forEach( id -> sendMsg(topicPublisher, id) );
 
         // Take the duration
-        long durationTime = System.currentTimeMillis() - startTime;
+        final long durationTime = System.currentTimeMillis() - startTime;
 
         log.info("****** Finished Vega Test: Duration endTime={}ms ******", durationTime);
 
@@ -127,7 +127,7 @@ class Publisher implements IClient {
 
         // Prepare and send the message
         sendBuffer.putInt(0, messageId);
-        PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, 4);
+        final PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, 4);
 
         // Check if we have back pressure
         if (BackPressureManager.checkAndControl(result)) {
@@ -162,12 +162,12 @@ class Publisher implements IClient {
             throws VegaException, InterruptedException {
 
         // Create the channel
-        ITopicPublisher topicPublisher = createChannels(instance);
+        final ITopicPublisher topicPublisher = createChannels(instance);
 
         warnUpJVM(topicPublisher);
 
         // Execute the tests
-        var testResults = executeTest(topicPublisher, sizeTest);
+        final var testResults = executeTest(topicPublisher, sizeTest);
 
         // Close the channels.
         close(topicPublisher);
@@ -175,4 +175,11 @@ class Publisher implements IClient {
         return testResults;
     }
 
+    /**
+     * Returns the ClientTypeEnum of the service
+     * @return ClientTypeEnum of the service
+     */
+    public ClientTypeEnum getClientType() {
+        return clientType;
+    }
 }
