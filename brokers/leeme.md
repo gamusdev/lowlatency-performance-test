@@ -1,37 +1,6 @@
-#AsyncApi
-https://www.asyncapi.com/
-#AsyncapiGenerator
-https://hub.docker.com/r/asyncapi/generator
-
-docker pull asyncapi/generator:1.9.4
-
 # Spring Cloud Streams
 ````
-cd common-launcher/src/main/resources/AsyncApiTools
-docker run --rm -v $PWD:/local asyncapi/generator:1.9.4 --version
-
-# From Street Ligths (Asyncapi example)
-docker run --rm \
-    -v $PWD:/local asyncapi/generator:1.9.4 /local/streetLigths.yml @asyncapi/java-spring-cloud-stream-template \
-    -o /local/code/rabbit/streetligth --debug -p binder=rabbit
-
-# Rabbit
-docker run --rm \
-    -v $PWD:/local asyncapi/generator:1.9.4 /local/integerTest.yml @asyncapi/java-spring-cloud-stream-template \
-    -o /local/code/rabbit/in --debug -p binder=rabbit
-
-docker run --rm \
-    -v $PWD:/local asyncapi/generator:1.9.4 /local/integerTest.yml @asyncapi/java-spring-cloud-stream-template \
-    -o /local/code/rabbit/out --debug -p binder=rabbit -p view=provider
-
-# Kafka
-docker run --rm \
-    -v $PWD:/local asyncapi/generator:1.9.4 /local/integerTest.yml @asyncapi/java-spring-cloud-stream-template \
-    -o /local/code/kafka/in --debug -p binder=kafka
-
-docker run --rm \
-    -v $PWD:/local asyncapi/generator:1.9.4 /local/integerTest.yml @asyncapi/java-spring-cloud-stream-template \
-    -o /local/code/kafka/out --debug -p binder=kafka -p view=provider
+java -jar brokers/target/brokers-0.0.1-SNAPSHOT.jar
 ````
 
 # Rabbit MQ
@@ -43,3 +12,29 @@ docker run --rm -d -p 15672:15672 -p 5672:5672 --name my_rabbit rabbitmq:3-manag
 #Web interface on 
 localhost:15672 with guest/guest
 ````
+
+# Kafka
+Download from: https://kafka.apache.org/quickstart
+
+Dockerfile
+````
+FROM azul/zulu-openjdk
+
+ADD unixRun.sh /app/
+ADD kafka_2.13-3.2.0 /app/kafka
+````
+
+docker build -t my-kafka:1.0.0 .
+
+````
+docker run -d -it --rm -p 9092:9092 --name my-kafka-bash my-kafka:1.0.0 bash
+
+docker exec -it my-kafka-bash bash
+
+bash /app/unixRun.sh
+
+/app/kafka/bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+````
+
+Add "container name" to /etc/hosts
+

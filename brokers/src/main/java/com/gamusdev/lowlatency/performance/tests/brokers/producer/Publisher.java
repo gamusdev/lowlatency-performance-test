@@ -1,7 +1,6 @@
-package com.gamusdev.lowlatency.performance.tests.rabbitmq.producer;
+package com.gamusdev.lowlatency.performance.tests.brokers.producer;
 
-import com.gamusdev.lowlatency.performance.tests.rabbitmq.consumer.Subscriber;
-import com.gamusdev.lowlatency.performance.tests.rabbitmq.utils.Constants;
+import com.gamusdev.lowlatency.performance.tests.brokers.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +27,7 @@ public class Publisher {
         logger.info("------------> Creating producer");
 
         return () -> Flux.fromStream(
-                Stream.iterate(-200,                   // start
+                Stream.iterate(-1000,                   // start
                 n -> n <= Constants.END,// Predicate to finish
                 n -> n + 1  // Increment
             )

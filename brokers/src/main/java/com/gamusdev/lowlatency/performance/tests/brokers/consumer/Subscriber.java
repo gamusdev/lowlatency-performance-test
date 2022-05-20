@@ -1,10 +1,10 @@
-package com.gamusdev.lowlatency.performance.tests.rabbitmq.consumer;
+package com.gamusdev.lowlatency.performance.tests.brokers.consumer;
 
-import com.gamusdev.lowlatency.performance.tests.rabbitmq.utils.Constants;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.gamusdev.lowlatency.performance.tests.brokers.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;

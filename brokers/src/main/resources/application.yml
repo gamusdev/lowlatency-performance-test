@@ -5,9 +5,15 @@ spring:
     stream:
       bindings:
         onIntegersMeasuredConsumer-in-0:
-          destination: integer/measured
+          destination: integer-measured
+          binder: rabbit
+          #binder: kafka
         onIntegersMeasuredSupplier-out-0:
-          destination: integer/measured
+          destination: integer-measured
+          binder: rabbit
+          #binder: kafka
+
+
 logging:
   level:
     root: info
