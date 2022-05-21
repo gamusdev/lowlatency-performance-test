@@ -49,7 +49,6 @@ public class Publisher {
     @Bean
     public Supplier<Flux<Integer>> onIntegersMeasured() {
 
-        // TODO Falla el checksum
         // Calculate the checksum of the data that will be sent
         long checksum = LongStream.iterate(1,  // start
                 n -> n <= config.getSizeTest(),// Predicate to finish
