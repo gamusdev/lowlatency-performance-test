@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import javax.annotation.PreDestroy;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 /**
@@ -48,8 +49,9 @@ public class Publisher {
     @Bean
     public Supplier<Flux<Integer>> onIntegersMeasured() {
 
+        // TODO Falla el checksum
         // Calculate the checksum of the data that will be sent
-        long checksum = IntStream.iterate(1,  // start
+        long checksum = LongStream.iterate(1,  // start
                 n -> n <= config.getSizeTest(),// Predicate to finish
                 n -> n + 1  // Increment
         ).sum();

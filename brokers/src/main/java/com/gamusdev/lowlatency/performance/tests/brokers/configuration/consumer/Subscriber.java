@@ -33,7 +33,7 @@ public class Subscriber {
     private final Config config;
 
     /** Messages received */
-    public static final AtomicInteger receivedCounter = new AtomicInteger(0);
+    private final AtomicInteger receivedCounter = new AtomicInteger(0);
 
     /** The checksum is the sum of all the messageId published */
     private final AtomicLong checksum = new AtomicLong(0);
