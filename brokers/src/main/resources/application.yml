@@ -1,7 +1,7 @@
 spring:
   cloud:
-    function:
-      definition: onIntegersMeasuredConsumer;onIntegersMeasuredSupplier
+    #function:
+      #definition: onIntegersMeasuredConsumer;onIntegersMeasuredSupplier
     stream:
       bindings:
         onIntegersMeasuredConsumer-in-0:
@@ -12,7 +12,6 @@ spring:
           destination: integer-measured
           binder: rabbit
           #binder: kafka
-
 
 logging:
   level:
