@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import reactor.core.publisher.Flux;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -50,6 +51,7 @@ public class Subscriber {
      */
     @Bean
     public Consumer<Integer> onIntegersMeasured() {
+    //    public Consumer<Flux<Integer>> onIntegersMeasured() {
 
         log.info("****** Start Broker Test: Consumer waiting for {}", config.getSizeTest());
 
@@ -60,6 +62,7 @@ public class Subscriber {
                 startTime = System.currentTimeMillis();
             }
 
+            //data.filter( d -> d.equals(Config.CLOSE_ID) ).reduce((x, y) -> x + y).;
             // If the received data is the finish signal, finish the test
             if ( Config.CLOSE_ID.equals(data)) {
 
@@ -68,13 +71,11 @@ public class Subscriber {
                 log.info("****** Broker Test Finished: Duration: {}," +
                         "Received {} messages, checksum {}",
                         duration, receivedCounter.decrementAndGet(), checksum);
-
-                // Exit the Consumer
-                System.exit(0);
             }
-
-            // Add the received data to the checksum
-            checksum.addAndGet(data);
+            else {
+                // Add the received data to the checksum
+                checksum.addAndGet(data);
+            }
         };
     }
 }
