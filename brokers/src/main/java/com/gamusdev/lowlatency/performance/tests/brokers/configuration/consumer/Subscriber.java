@@ -11,6 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+/**
+ * Subscriber class
+ * Receives the integers from the broker
+ * Loaded only if the broker.clientType environment variable is configured to SUB
+ */
 @Configuration
 @Slf4j
 @ConditionalOnProperty(
@@ -19,6 +24,9 @@ import java.util.function.Consumer;
         matchIfMissing = false)
 public class Subscriber {
 
+    /**
+     * Configuration read from environment variables
+     */
     @Autowired
     private final Config config;
 
@@ -29,7 +37,7 @@ public class Subscriber {
     private final AtomicLong checksum = new AtomicLong(0);
 
     /** Start time, when te first message is received */
-    long startTime = 0;
+    private long startTime = 0;
 
     /** Constructor */
     public Subscriber(Config config) {
@@ -46,18 +54,20 @@ public class Subscriber {
         log.info("****** Start Broker Test: Consumer waiting for {}", config.getSizeTest());
 
         return data -> {
-            int count = receivedCounter.getAndIncrement();
 
-            //log.info("receivedCount {}, data {}", count, data);
-
-            if (count == 1) {
+            // If it is the first data, save the start time
+            if (receivedCounter.getAndIncrement() == 0) {
                 startTime = System.currentTimeMillis();
             }
-            else if ( Config.CLOSE_ID.equals(data)) {
-                long finishTime = System.currentTimeMillis() - startTime;
+
+            // If the received data is the finish signal, finish the test
+            if ( Config.CLOSE_ID.equals(data)) {
+
+                // Take the duration. Decrement the signal message from the counter
+                long duration = System.currentTimeMillis() - startTime;
                 log.info("****** Broker Test Finished: Duration: {}," +
                         "Received {} messages, checksum {}",
-                        finishTime, count, checksum);
+                        duration, receivedCounter.decrementAndGet(), checksum);
 
                 // Exit the Consumer
                 System.exit(0);
