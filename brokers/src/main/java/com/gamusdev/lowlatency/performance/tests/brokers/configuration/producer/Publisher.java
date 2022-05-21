@@ -46,7 +46,7 @@ public class Publisher {
      * @return The Supplier
      */
     @Bean
-    public Supplier<Flux<Integer>> onIntegersMeasuredSupplier() {
+    public Supplier<Flux<Integer>> onIntegersMeasured() {
 
         int checksum = IntStream.iterate(1,  // start
                 n -> n <= config.getSizeTest(),// Predicate to finish

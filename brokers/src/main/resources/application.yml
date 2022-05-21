@@ -1,14 +1,14 @@
 spring:
   cloud:
-    #function:
-      #definition: onIntegersMeasuredConsumer;onIntegersMeasuredSupplier
+    function:
+      definition: onIntegersMeasured
     stream:
       bindings:
-        onIntegersMeasuredConsumer-in-0:
+        onIntegersMeasured-in-0:
           destination: integer-measured
           binder: rabbit
           #binder: kafka
-        onIntegersMeasuredSupplier-out-0:
+        onIntegersMeasured-out-0:
           destination: integer-measured
           binder: rabbit
           #binder: kafka

@@ -41,7 +41,7 @@ public class Subscriber {
      * @return The Consumer
      */
     @Bean
-    public Consumer<Integer> onIntegersMeasuredConsumer() {
+    public Consumer<Integer> onIntegersMeasured() {
 
         log.info("****** Start Broker Test: Consumer waiting for {}", config.getSizeTest());
 
