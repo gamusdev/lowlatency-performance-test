@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 
+import javax.annotation.PreDestroy;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -32,13 +33,10 @@ public class Subscriber {
     private final Config config;
 
     /** Messages received */
-    private final AtomicInteger receivedCounter = new AtomicInteger(0);
+    public static final AtomicInteger receivedCounter = new AtomicInteger(0);
 
     /** The checksum is the sum of all the messageId published */
     private final AtomicLong checksum = new AtomicLong(0);
-
-    /** Start time, when te first message is received */
-    private long startTime = 0;
 
     /** Constructor */
     public Subscriber(Config config) {
@@ -50,32 +48,24 @@ public class Subscriber {
      * @return The Consumer
      */
     @Bean
-    public Consumer<Integer> onIntegersMeasured() {
-    //    public Consumer<Flux<Integer>> onIntegersMeasured() {
+    public Consumer<Flux<Integer>> onIntegersMeasured() {
 
         log.info("****** Start Broker Test: Consumer waiting for {}", config.getSizeTest());
 
-        return data -> {
-
-            // If it is the first data, save the start time
-            if (receivedCounter.getAndIncrement() == 0) {
-                startTime = System.currentTimeMillis();
-            }
-
-            //data.filter( d -> d.equals(Config.CLOSE_ID) ).reduce((x, y) -> x + y).;
-            // If the received data is the finish signal, finish the test
-            if ( Config.CLOSE_ID.equals(data)) {
-
-                // Take the duration. Decrement the signal message from the counter
-                long duration = System.currentTimeMillis() - startTime;
-                log.info("****** Broker Test Finished: Duration: {}," +
-                        "Received {} messages, checksum {}",
-                        duration, receivedCounter.decrementAndGet(), checksum);
-            }
-            else {
-                // Add the received data to the checksum
-                checksum.addAndGet(data);
-            }
-        };
+        // Actualize counters
+        return data -> data.
+                    //log().
+                    filter(d-> !Config.CLOSE_ID.equals(d)).
+                    subscribe( d -> {
+                        receivedCounter.incrementAndGet();
+                        checksum.addAndGet(d);
+                    });
     }
+
+    @PreDestroy
+    public void destroy() {
+        log.info("****** Broker Test Finished: Received {} messages, checksum {} ******",
+                receivedCounter.get(), checksum);
+    }
+
 }

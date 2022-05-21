@@ -34,6 +34,9 @@ public class PerformanceChannelInterceptor implements org.springframework.messag
      */
     private final byte[] CloseIdBytes;
 
+    /** Start time, when te first message is received */
+    private long startTime = 0;
+
     /**
      * Constructor
      */
@@ -52,8 +55,17 @@ public class PerformanceChannelInterceptor implements org.springframework.messag
      */
     @Override
     public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, @Nullable Exception ex) {
+        // If it is the first data, save the start time
+        if (this.startTime == 0) {
+            this.startTime = System.currentTimeMillis();
+        }
+
         if(Arrays.equals(this.CloseIdBytes, (byte[]) message.getPayload())) {
-            log.info("*******Finish sending integers");
+
+            // Take the duration. Decrement the signal message from the counter
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("****** Broker Test Finished: Duration: {} ******", duration);
+
             context.close();
         }
     }
