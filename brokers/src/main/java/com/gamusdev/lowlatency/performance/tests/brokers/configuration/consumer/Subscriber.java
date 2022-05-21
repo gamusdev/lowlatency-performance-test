@@ -52,7 +52,7 @@ public class Subscriber {
 
         log.info("****** Start Broker Test: Consumer waiting for {}", config.getSizeTest());
 
-        // Actualize counters
+        // Update counters
         return data -> data.
                     //log().
                     filter(d-> !Config.CLOSE_ID.equals(d)).

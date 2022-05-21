@@ -49,7 +49,7 @@ public class Publisher {
     public Supplier<Flux<Integer>> onIntegersMeasured() {
 
         // Calculate the checksum of the data that will be sent
-        int checksum = IntStream.iterate(1,  // start
+        long checksum = IntStream.iterate(1,  // start
                 n -> n <= config.getSizeTest(),// Predicate to finish
                 n -> n + 1  // Increment
         ).sum();
