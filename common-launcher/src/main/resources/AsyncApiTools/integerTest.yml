@@ -1,0 +1,23 @@
+asyncapi: '2.2.0'
+info:
+  title: Test API
+  version: '1.0.0'
+  description: |
+    The Test API to peformance measure.
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+channels:
+  integer/measured:
+    publish:
+      summary: Integers performance test.
+      operationId: onIntegersMeasured
+      message:
+        name: IntegersMeasured
+        payload:
+          type: object
+          properties:
+            id:
+              type: integer
+              minimum: 0
+              description: Id of the test message.

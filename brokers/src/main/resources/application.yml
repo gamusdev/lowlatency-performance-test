@@ -1,0 +1,21 @@
+spring:
+  cloud:
+    function:
+      definition: onIntegersMeasured
+    stream:
+      bindings:
+        onIntegersMeasured-in-0:
+          destination: integer-measured
+          binder: rabbit
+          #binder: kafka
+        onIntegersMeasured-out-0:
+          destination: integer-measured
+          binder: rabbit
+          #binder: kafka
+
+logging:
+  level:
+    root: info
+    org:
+      springframework: info
+
