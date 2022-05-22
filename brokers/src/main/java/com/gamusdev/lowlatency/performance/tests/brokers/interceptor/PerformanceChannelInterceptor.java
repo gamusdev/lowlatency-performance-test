@@ -3,15 +3,14 @@ package com.gamusdev.lowlatency.performance.tests.brokers.interceptor;
 import com.gamusdev.lowlatency.performance.tests.brokers.configuration.Config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.integration.config.GlobalChannelInterceptor;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Service;
 
+import org.springframework.messaging.support.ChannelInterceptor;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -22,15 +21,15 @@ import java.util.Arrays;
 @Slf4j
 @Service
 @GlobalChannelInterceptor
-public class PerformanceChannelInterceptor implements org.springframework.messaging.support.ChannelInterceptor {
+public class PerformanceChannelInterceptor implements ChannelInterceptor {
 
     /**
      * Application context
      */
-    private ConfigurableApplicationContext context;
+    private final ConfigurableApplicationContext context;
 
     /**
-     * Final signal in bytes to compare with the messages payload.
+     * Final signal in bytes to compare with the message payload.
      */
     private final byte[] CloseIdBytes;
 

@@ -9,7 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.annotation.PreDestroy;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
@@ -49,22 +48,20 @@ public class Publisher {
     @Bean
     public Supplier<Flux<Integer>> onIntegersMeasured() {
 
-        // Calculate the checksum of the data that will be sent
-        long checksum = LongStream.iterate(1,  // start
-                n -> n <= config.getSizeTest(),// Predicate to finish
-                n -> n + 1  // Increment
-        ).sum();
-
         log.info("****** Start Broker Test: Publishing data. Sending {} integers, checksum {} ******",
-                config.getSizeTest(), checksum);
+                config.getSizeTest(), getChecksum());
 
         // Create the Flux<Integer> supplier, adding the CLOSE_ID signal to finish the test
         return () -> Flux.fromStream(
-                Stream.iterate(1,         // start
-                n -> n <= config.getSizeTest(),// Predicate to finish
-                n -> n + 1                     // Increment
-            )
+                IntStream.rangeClosed(1, config.getSizeTest()).boxed()
         ).concatWith(Mono.just(Config.CLOSE_ID));
+    }
 
+    /**
+     * Calculate the checksum of the data that will be sent
+     * @return the checksum
+     */
+    private long getChecksum() {
+        return LongStream.rangeClosed(1, config.getSizeTest()).sum();
     }
 }
