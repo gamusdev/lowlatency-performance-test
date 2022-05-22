@@ -11,24 +11,22 @@ import java.util.ServiceLoader;
  * Strategy Pattern
  */
 @Slf4j
-public class ClientFactory implements IClientFactory{
+public class ClientFactory {
 
     /**
      * Map with the relationship between TestType and test to execute.
      */
-    private Map<IClient.ClientTypeEnum, IClient> clientsMap = new HashMap<>();
+    private static Map<IClient.ClientTypeEnum, IClient> CLIENTS = new HashMap<>();
 
     /**
-     * Constructor
      * Initializes clientsMap using Java 11 ServiceLoader.
      * The service loader uses META-INF/services/ files to inject the services
      * See: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html
      */
-    public ClientFactory() {
-        super();
+    static {
         ServiceLoader.load(IClient.class).
-                forEach( s -> clientsMap.put(s.getClientType(), s) );
-        log.info("IClients loaded: {}", clientsMap.toString());
+                forEach( s -> CLIENTS.put(s.getClientType(), s) );
+        log.info("IClients loaded: {}", CLIENTS.toString());
     }
 
     /**
@@ -36,7 +34,7 @@ public class ClientFactory implements IClientFactory{
      * @param testType ClientTypeEnum.PUB or ClientTypeEnum.SUB
      * @return the instance of the desired type
      */
-    public IClient getInstance(final IClient.ClientTypeEnum testType){
-        return clientsMap.get(testType);
+    public static IClient getInstance(final IClient.ClientTypeEnum testType){
+        return CLIENTS.get(testType);
     }
 }

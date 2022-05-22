@@ -52,7 +52,7 @@ public class VegaTestExecutor implements ITestExecutor {
             final IVegaInstance instance = VegaInstance.createNewInstance(params);
 
             // Execute the test (PUB -> Publisher, SUB -> Subscriber)
-            testResults = new ClientFactory()
+            testResults = ClientFactory
                     .getInstance(launchParameters.getClientTypeEnum())
                     .run(instance, launchParameters.getSizeTest());
 
