@@ -19,12 +19,12 @@ public class Launcher {
             throws ParseException, GenericAeronVegaException {
 
 
-        /**
+        /*
          * Initialize the TestExecutor using Java 11 ServiceLoader.
          * The service loader uses META-INF/services/ files to inject the services
          * See: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html
          */
-        Optional<ITestExecutor> optTestExecutor = ServiceLoader.load(ITestExecutor.class).findFirst();
+        final Optional<ITestExecutor> optTestExecutor = ServiceLoader.load(ITestExecutor.class).findFirst();
 
         if (optTestExecutor.isPresent()) {
             // Execute the desired tests

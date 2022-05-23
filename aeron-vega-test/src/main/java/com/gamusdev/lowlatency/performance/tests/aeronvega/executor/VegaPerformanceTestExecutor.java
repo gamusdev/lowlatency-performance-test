@@ -5,6 +5,7 @@ import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.ClientFactory;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.ICommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.VegaCommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.LaunchParameters;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
@@ -13,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
 
 /**
@@ -23,7 +26,7 @@ import java.io.IOException;
  * - Finally, print the results
  */
 @Slf4j
-public class VegaTestExecutor implements ITestExecutor {
+public class VegaPerformanceTestExecutor implements ITestExecutor {
 
     /** Instance name*/
     private static final String INSTANCE_NAME = "TestInstance";
@@ -36,7 +39,13 @@ public class VegaTestExecutor implements ITestExecutor {
             throws ParseException, GenericAeronVegaException {
 
         // Create a command line parser, parse and validate the parameters
-        final VegaCommandLineParser parser = new VegaCommandLineParser();
+        final Optional<ICommandLineParser> optionalICommandLineParser = ServiceLoader.load(ICommandLineParser.class).findFirst();
+        if (optionalICommandLineParser.isEmpty()) {
+            log.error("ICommandLineParser NOT FOUND");
+            System.exit(1);
+        }
+        final ICommandLineParser parser = optionalICommandLineParser.get();
+
         final LaunchParameters launchParameters = parser.parseCommandLine(args);
 
         log.info("Launching VegaExecutor with parameters [{}]", launchParameters);
