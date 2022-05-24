@@ -63,6 +63,10 @@ public class LaunchParameters {
             }
         }
 
+        log.info("Executing test with configFilePath {} ," +
+                "clientType {}, " +
+                "sizeTest {}.", pConfigFilePath, pClientType, pSizeTest);
+
     }
 
 }
