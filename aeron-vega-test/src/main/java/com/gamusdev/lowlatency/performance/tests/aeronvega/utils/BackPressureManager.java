@@ -14,6 +14,7 @@ public class BackPressureManager {
     /** Last back pressured timestamp*/
     private static AtomicLong lastBackPressured = new AtomicLong(0);
 
+    private static final int MAX_SLEEP = 1000;
     /**
      * Checks if the result msg is indicates back pressured and sleep some time to control it.
      *
@@ -36,7 +37,7 @@ public class BackPressureManager {
 
                 // Calculates the time to sleep
                 long fromLastBackPresure = System.currentTimeMillis() - lastBackPressured.get() + 1;
-                long timeToSleep = 1000 / fromLastBackPresure;
+                long timeToSleep = MAX_SLEEP / fromLastBackPresure;
 
                 log.info("{} detected. Waiting {} ms...", result, timeToSleep);
 
