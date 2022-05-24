@@ -1,14 +1,12 @@
 package com.gamusdev.lowlatency.performance.tests.aeronvega.utils;
 
 import com.bbva.kyof.vega.msg.PublishResult;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 public class BackPressureManagerTest {
 
     private static final int MAX_SLEEP = 1000;
@@ -33,6 +31,5 @@ public class BackPressureManagerTest {
 
         // Test that the check sleeps less than MAX_SLEEP / 10 second
         Assertions.assertTrue( finish - start < MAX_SLEEP / LAST_BACK_PRESSURED);
-        log.info("Duration {}", finish - start);
     }
 }

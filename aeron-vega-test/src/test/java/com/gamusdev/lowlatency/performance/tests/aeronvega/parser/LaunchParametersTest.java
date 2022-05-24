@@ -20,7 +20,7 @@ public class LaunchParametersTest {
         final Integer sizeTest = 10;
 
         // Then
-        LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest.toString());
+        final LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest.toString());
 
         // Verify
         Assertions.assertEquals(configFilePath, launchParameters.getVegaConfigFilePath());
@@ -40,7 +40,7 @@ public class LaunchParametersTest {
         final Integer sizeTest = 10;
 
         // Then
-        LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest.toString());
+        final LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest.toString());
 
         // Verify
         Assertions.assertEquals(configFilePath, launchParameters.getVegaConfigFilePath());
@@ -57,7 +57,7 @@ public class LaunchParametersTest {
         final String sizeTest = "10a";
 
         // Then
-        LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest);
+        final LaunchParameters launchParameters = new LaunchParameters(configFilePath, clientType, sizeTest);
 
         // Verify
         Assertions.assertEquals(configFilePath, launchParameters.getVegaConfigFilePath());
