@@ -6,7 +6,6 @@ import com.bbva.kyof.vega.protocol.VegaInstance;
 import com.bbva.kyof.vega.protocol.common.VegaInstanceParams;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.clients.ClientFactory;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.ICommandLineParser;
-import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.VegaCommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.LaunchParameters;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.exception.GenericAeronVegaException;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
@@ -26,7 +25,7 @@ import java.util.ServiceLoader;
  * - Finally, print the results
  */
 @Slf4j
-public class VegaPerformanceTestExecutor implements ITestExecutor {
+public final class VegaPerformanceTestExecutor implements ITestExecutor {
 
     /** Instance name*/
     private static final String INSTANCE_NAME = "TestInstance";
@@ -76,6 +75,5 @@ public class VegaPerformanceTestExecutor implements ITestExecutor {
         }
 
     }
-
 
 }

@@ -30,7 +30,6 @@ public class LauncherTest {
     public void mainOkTest() throws ParseException, GenericAeronVegaException {
         // When
         final ITestExecutor testExecutorMock = Mockito.mock(ITestExecutor.class);
-
         final Optional<ITestExecutor> optional = Optional.of(testExecutorMock);
 
         try (MockedStatic<ServiceLoader> serviceLoaderFactoryMock = Mockito.mockStatic(ServiceLoader.class)) {
