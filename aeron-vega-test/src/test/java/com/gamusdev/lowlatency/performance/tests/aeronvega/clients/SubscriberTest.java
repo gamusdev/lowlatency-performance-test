@@ -10,6 +10,7 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -41,62 +42,11 @@ public class SubscriberTest {
     @InjectMocks
     private Subscriber subscriber;
 
-    @Test
-    public void runOk() throws VegaException, InterruptedException, BrokenBarrierException {
-        // **** Initialize
+    @BeforeEach
+    public void initEach() {
         // Launch the Subscriber
         final Runnable subcriberRunnable = () -> launchSubscriber(instance, SIZE_TEST);
         new Thread(subcriberRunnable).start();
-
-        // Wait the Subscriber some time to get up
-        Thread.sleep(500);
-
-        // **** When
-        // Capture the Subscriber's listener
-        final ArgumentCaptor<ITopicSubListener> listenerCaptor = ArgumentCaptor.forClass(ITopicSubListener.class);
-        Mockito.verify( instance ).subscribeToTopic(eq(Constants.TOPIC_NAME), listenerCaptor.capture());
-        final ITopicSubListener listener = listenerCaptor.getValue();
-        //var capture = listenerCaptor.getAllValues();
-
-        // Prepare the data to send to the Subscriber
-        final IRcvMessage msg = Mockito.mock(IRcvMessage.class);
-        Mockito.when(msg.getContentOffset()).thenReturn(0);
-        final UnsafeBuffer receiverBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
-
-        // **** Then
-        // Send WARM_UP data
-        /*IntStream.rangeClosed( 1, SIZE_TEST/10 )
-                .forEach( id -> {
-                    receiverBuffer.putInt(0, id);
-                    Mockito.when(msg.getContents()).thenReturn(receiverBuffer);
-                    listener.onMessageReceived(msg);
-                });*/
-
-        // Send SIZE_TEST data
-        IntStream.rangeClosed( 1, SIZE_TEST )
-                .forEach( id -> {
-                    receiverBuffer.putInt(0, id);
-                    Mockito.when(msg.getContents()).thenReturn(receiverBuffer);
-                    listener.onMessageReceived(msg);
-                });
-
-        // Send end Signal
-        receiverBuffer.putInt(0, CLOSE_ID);
-        Mockito.when(msg.getContents()).thenReturn(receiverBuffer);
-        listener.onMessageReceived(msg);
-
-        // Wait until the test is finished
-        cyclicBarrier.await();
-
-        // Verify
-        Assertions.assertEquals(SIZE_TEST, result.getTotalMessages());
-        Assertions.assertTrue(result.getDuration() > 0);
-        Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
-    }
-
-    @Test
-    public void getClientTypeTest() {
-        Assertions.assertEquals(IClient.ClientTypeEnum.SUB, subscriber.getClientType());
     }
 
     /**
@@ -120,4 +70,90 @@ public class SubscriberTest {
             e.printStackTrace();
         }
     }
+
+    private ITopicSubListener captureListener() throws VegaException {
+        final ArgumentCaptor<ITopicSubListener> listenerCaptor = ArgumentCaptor.forClass(ITopicSubListener.class);
+        Mockito.verify( instance ).subscribeToTopic(eq(Constants.TOPIC_NAME), listenerCaptor.capture());
+        return listenerCaptor.getValue();
+    }
+
+    /**
+     * Simulate the reception of the message.
+     * @param receiverBuffer the buffer to use
+     * @param iRcvMessage iRcvMessage
+     * @param listener the listener
+     * @param message the message to receive
+     */
+    private void simulateSentMessage
+            ( final UnsafeBuffer receiverBuffer, final IRcvMessage iRcvMessage,
+              final ITopicSubListener listener, final int message ) {
+        receiverBuffer.putInt(0, message);
+        Mockito.when(iRcvMessage.getContents()).thenReturn(receiverBuffer);
+        listener.onMessageReceived(iRcvMessage);
+    }
+
+    @Test
+    public void runOk() throws VegaException, InterruptedException, BrokenBarrierException {
+        // Wait the Subscriber some time to get up
+        Thread.sleep(500);
+
+        // **** When
+        // Capture the Subscriber's listener
+        final ITopicSubListener listener = captureListener();
+
+        // Prepare the data that will be received by the Subscriber
+        final IRcvMessage iRcvMessage = Mockito.mock(IRcvMessage.class);
+        Mockito.when(iRcvMessage.getContentOffset()).thenReturn(0);
+        final UnsafeBuffer receiverBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
+
+        // **** Then
+        // Send SIZE_TEST data
+        IntStream.rangeClosed( 1, SIZE_TEST )
+                .forEach( id -> simulateSentMessage( receiverBuffer, iRcvMessage, listener, id ) );
+
+        // Send End Signal
+        simulateSentMessage( receiverBuffer, iRcvMessage, listener, CLOSE_ID );
+
+        // Wait until the test is finished
+        cyclicBarrier.await();
+
+        // Verify
+        Assertions.assertEquals(SIZE_TEST, result.getTotalMessages());
+        Assertions.assertTrue(result.getDuration() > 0);
+        Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
+    }
+
+
+
+    @Test
+    public void runKO() throws VegaException, InterruptedException, BrokenBarrierException {
+        // Wait the Subscriber some time to get up
+        Thread.sleep(500);
+
+        // **** When
+        // Capture the Subscriber's listener
+        final ITopicSubListener listener = captureListener();
+
+        // Prepare the data to send to the Subscriber
+        final IRcvMessage iRcvMessage = Mockito.mock(IRcvMessage.class);
+        Mockito.when(iRcvMessage.getContentOffset()).thenReturn(0);
+        final UnsafeBuffer receiverBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
+
+        // **** Then
+        // Send end Signal without data
+        simulateSentMessage( receiverBuffer, iRcvMessage, listener, CLOSE_ID );
+
+        // Wait until the test is finished
+        cyclicBarrier.await();
+
+        // Verify
+        Assertions.assertNotEquals(SIZE_TEST, result.getTotalMessages());
+        Assertions.assertTrue(result.getDuration() > 0);
+    }
+
+    @Test
+    public void getClientTypeTest() {
+        Assertions.assertEquals(IClient.ClientTypeEnum.SUB, subscriber.getClientType());
+    }
+
 }

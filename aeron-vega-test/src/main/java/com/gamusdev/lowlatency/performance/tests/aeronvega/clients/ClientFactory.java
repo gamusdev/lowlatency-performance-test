@@ -2,7 +2,6 @@ package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
@@ -14,39 +13,23 @@ import java.util.stream.Collectors;
 public final class ClientFactory {
 
     /**
-     * Map with the relationship between TestType and test to execute.
-     */
-    private static Map<IClient.ClientTypeEnum, IClient> CLIENTS;
-
-    /**
-     * Initializes clientsMap using Java 11 ServiceLoader.
-     * The service loader uses META-INF/services/ files to inject the services
-     * See: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html
-     */
-    static {
-        CLIENTS = ServiceLoader.load(IClient.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toMap(IClient::getClientType, s -> s));
-        log.info("IClients loaded: {}", CLIENTS);
-    }
-
-    /**
      * private Constructor
      */
     private ClientFactory() {
     }
 
     /**
-     * Factory method that creates an instance of the desired client
+     * Factory method that returns an instance of the desired client.
+     * Lazy initialization: Only load the objects as they are requested
+     * The service loader uses META-INF/services/ files to inject the services
+     * See: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html
      * @param testType ClientTypeEnum.PUB or ClientTypeEnum.SUB
      * @return the instance of the desired type
      */
     public static IClient getInstance(final IClient.ClientTypeEnum testType){
-
-/*        CLIENTS = ServiceLoader.load(IClient.class).stream()
+        return ServiceLoader.load(IClient.class).stream()
                 .map(ServiceLoader.Provider::get)
-                .collect(Collectors.toMap(IClient::getClientType, s -> s));
-*/
-        return CLIENTS.get(testType);
+                .filter( c -> c.getClientType().equals(testType))
+                .findFirst().get();
     }
 }

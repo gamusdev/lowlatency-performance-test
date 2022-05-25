@@ -1,6 +1,5 @@
 package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 
-import com.gamusdev.lowlatency.performance.tests.aeronvega.executor.ITestExecutor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

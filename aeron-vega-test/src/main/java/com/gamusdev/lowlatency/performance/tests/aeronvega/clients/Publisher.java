@@ -59,26 +59,6 @@ public class Publisher implements IClient {
     }
 
     /**
-     * When starts, the JVN creates some optimizations, but it needs some training.
-     * Number of messages sent to warn up the JVM.
-     * The purpose of this method is to train the JVM
-     * */
-    /*private void warnUpJVM(ITopicPublisher topicPublisher) throws InterruptedException {
-        log.info("****** Start Vega warm up ******");
-
-        // Send the training messages
-        Stream.iterate(1,                   // start
-                n -> n <= WARN_UP_MESSAGES,// Predicate to finish
-                n -> n + 1                      // Increment
-        ).forEach( id -> sendMsg(topicPublisher, id) );
-
-        log.info("****** Finished Vega warm up ******");
-
-        // Give some time to the receiver to consume the warm messages
-        Thread.sleep(TIME_TO_WAIT);
-    }*/
-
-    /**
      * Execute the test
      * @param topicPublisher the topicPublisher where send the messages
      * @param sizeTest the number of messages to send in the test
@@ -125,7 +105,6 @@ public class Publisher implements IClient {
             //Resend the message
             sendMsg(topicPublisher, messageId);
         }
-
     }
 
     /**
@@ -150,9 +129,6 @@ public class Publisher implements IClient {
 
         // Create the channel
         final ITopicPublisher topicPublisher = createChannels(instance);
-
-        // To let the JVM take some optimizations before the test
-        // warnUpJVM(topicPublisher);
 
         // Execute the tests
         final var testResults = executeTest(topicPublisher, sizeTest);

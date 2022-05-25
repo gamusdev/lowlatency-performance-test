@@ -41,7 +41,7 @@ public final class VegaPerformanceTestExecutor implements ITestExecutor {
         final Optional<ICommandLineParser> optionalICommandLineParser = ServiceLoader.load(ICommandLineParser.class).findFirst();
         if (optionalICommandLineParser.isEmpty()) {
             log.error("ICommandLineParser NOT FOUND");
-            System.exit(1);
+            throw new GenericAeronVegaException("ICommandLineParser NOT FOUND");
         }
         final ICommandLineParser parser = optionalICommandLineParser.get();
 

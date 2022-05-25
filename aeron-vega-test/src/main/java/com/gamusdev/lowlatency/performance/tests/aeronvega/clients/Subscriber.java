@@ -10,7 +10,6 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteOrder;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,19 +29,8 @@ public class Subscriber implements IClient {
     /** Messages received */
     private final AtomicInteger receivedCounter = new AtomicInteger();
 
-    /** Flag to warmUp */
-    //private final AtomicBoolean warmUpFlag = new AtomicBoolean(true);
-
     /** Flag to close */
     private boolean closeFlag;
-
-    /**
-     * Method to clear all counters and checksum
-     */
-    /*private void cleanCounters() {
-        checksum.set(0);
-        receivedCounter.set(0);
-    }*/
 
     /**
      * Constructor
@@ -79,18 +67,8 @@ public class Subscriber implements IClient {
                     checksum.addAndGet(receivedId);
                 }
 
-                // Increment the received messages & test if this message is the last for warming up
-
-                // TODO Activar warmUp
+                // Increment the received messages
                 receivedCounter.incrementAndGet();
-                /*if (receivedCounter.incrementAndGet() == WARN_UP_MESSAGES
-                        &&  warmUpFlag.getAndSet(false) ) {
-
-                    log.info("****** Finished Vega warm up ******");
-
-                    // clean counters
-                    cleanCounters();
-                }*/
             }
 
             @Override
@@ -113,7 +91,7 @@ public class Subscriber implements IClient {
         // Wait until the close signal is received
         while(!closeFlag) {
             // If the first message is received, take the startTime.
-            if (receivedCounter.get() > 1 && startTime == 0 /*&& !warmUpFlag.get()*/) {
+            if (receivedCounter.get() > 1 && startTime == 0) {
                 startTime = System.currentTimeMillis();
             }
 
