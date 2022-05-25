@@ -10,6 +10,7 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.ICommandLineParser;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.parser.LaunchParameters;
 import org.apache.commons.cli.ParseException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,6 +52,19 @@ public class VegaPerformanceTestExecutorTest {
     private VegaPerformanceTestExecutor executor;
 
     @Test
+    public void executeTestICommandLineParserNotFoundTest() throws ParseException, GenericAeronVegaException {
+        // When
+        try (MockedStatic<ServiceLoader> serviceLoaderFactoryMock = Mockito.mockStatic(ServiceLoader.class) ) {
+            serviceLoaderFactoryMock.when( () -> ServiceLoader.load(ICommandLineParser.class)).thenReturn(serviceLoaderMock);
+            Mockito.when(serviceLoaderMock.findFirst()).thenReturn(Optional.empty());
+
+            // Then
+            Assertions.assertThrows(GenericAeronVegaException.class,
+                    () -> executor.executeTest(ARGS));
+        }
+    }
+
+    @Test
     public void executeTestOkTest() throws ParseException, GenericAeronVegaException, VegaException, InterruptedException, IOException {
         // ******* When
         // Prepare CommandLineParser
@@ -59,8 +73,7 @@ public class VegaPerformanceTestExecutorTest {
 
         // Static ServiceLoader && VegaInstance
         try (MockedStatic<ServiceLoader> serviceLoaderFactoryMock = Mockito.mockStatic(ServiceLoader.class);
-             MockedStatic<VegaInstance> vegaInstanceFactoryMock = Mockito.mockStatic(VegaInstance.class)
-             ) {
+             MockedStatic<VegaInstance> vegaInstanceFactoryMock = Mockito.mockStatic(VegaInstance.class) ) {
 
             // Load CommandLineParser
             serviceLoaderFactoryMock.when( () -> ServiceLoader.load(ICommandLineParser.class)).thenReturn(serviceLoaderMock);
@@ -108,7 +121,6 @@ public class VegaPerformanceTestExecutorTest {
             // VegaInstance
             vegaInstanceFactoryMock.verify(() -> VegaInstance.createNewInstance(any()));
             Mockito.verify(vegaInstanceMock, Mockito.times(1)).close();
-
         }
     }
 }
