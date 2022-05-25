@@ -10,7 +10,6 @@ import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteOrder;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
