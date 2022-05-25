@@ -79,7 +79,6 @@ public class PublisherTest {
 
         // Prepare the topicPublisher Mock to return 3 BackPressure responses:
         final int backPressureOccurrences = ThreadLocalRandom.current().nextInt(0, MAX_BACKPRESSURE_OCCURRENCES);
-        //final UnsafeBuffer[] sendBufferArray = new UnsafeBuffer[backPressureOccurrences];
         IntStream.rangeClosed( 1, backPressureOccurrences )
                 .forEach( id -> {
                     // 1) Create the buffers

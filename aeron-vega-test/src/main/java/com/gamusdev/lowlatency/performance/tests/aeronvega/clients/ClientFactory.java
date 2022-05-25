@@ -42,6 +42,11 @@ public final class ClientFactory {
      * @return the instance of the desired type
      */
     public static IClient getInstance(final IClient.ClientTypeEnum testType){
+
+/*        CLIENTS = ServiceLoader.load(IClient.class).stream()
+                .map(ServiceLoader.Provider::get)
+                .collect(Collectors.toMap(IClient::getClientType, s -> s));
+*/
         return CLIENTS.get(testType);
     }
 }
