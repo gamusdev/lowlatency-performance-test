@@ -64,14 +64,6 @@ public class SubscriberTest {
         final UnsafeBuffer receiverBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
 
         // **** Then
-        // Send WARM_UP data
-        /*IntStream.rangeClosed( 1, SIZE_TEST/10 )
-                .forEach( id -> {
-                    receiverBuffer.putInt(0, id);
-                    Mockito.when(msg.getContents()).thenReturn(receiverBuffer);
-                    listener.onMessageReceived(msg);
-                });*/
-
         // Send SIZE_TEST data
         IntStream.rangeClosed( 1, SIZE_TEST )
                 .forEach( id -> {

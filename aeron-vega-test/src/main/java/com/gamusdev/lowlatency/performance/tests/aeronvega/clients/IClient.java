@@ -15,12 +15,6 @@ public interface IClient {
     /** Signal to finish the test */
     int CLOSE_ID = Integer.MAX_VALUE;
 
-    /**
-     * When starts, the JVN creates some optimizations, but it needs some training.
-     * Number of messages sent to warn up the JVM.
-     * */
-    int WARN_UP_MESSAGES = 1_000_000;
-
     /** Execute the client code
      *
      * @param instance Vega Instance

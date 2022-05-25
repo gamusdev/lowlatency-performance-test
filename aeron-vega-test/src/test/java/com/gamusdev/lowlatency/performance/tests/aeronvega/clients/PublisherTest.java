@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.eq;
 @ExtendWith(MockitoExtension.class)
 public class PublisherTest {
 
-    private static final int SIZE_TEST = 1_000_000;
+    private static final int SIZE_TEST = 1_000;
 
     private static final int MAX_BACKPRESSURE_OCCURRENCES = 20;
 
