@@ -5,6 +5,7 @@ import com.bbva.kyof.vega.msg.IRcvMessage;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.subscriber.ITopicSubListener;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Checksum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.agrona.concurrent.UnsafeBuffer;
@@ -18,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 import static com.gamusdev.lowlatency.performance.tests.aeronvega.clients.IClient.CLOSE_ID;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,10 +40,6 @@ public class SubscriberTest {
 
     @InjectMocks
     private Subscriber subscriber;
-
-    private long getChecksum() {
-        return LongStream.rangeClosed( 1, SIZE_TEST ).sum();
-    }
 
     @Test
     public void runOk() throws VegaException, InterruptedException, BrokenBarrierException {
@@ -68,6 +64,14 @@ public class SubscriberTest {
         final UnsafeBuffer receiverBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
 
         // **** Then
+        // Send WARM_UP data
+        /*IntStream.rangeClosed( 1, SIZE_TEST/10 )
+                .forEach( id -> {
+                    receiverBuffer.putInt(0, id);
+                    Mockito.when(msg.getContents()).thenReturn(receiverBuffer);
+                    listener.onMessageReceived(msg);
+                });*/
+
         // Send SIZE_TEST data
         IntStream.rangeClosed( 1, SIZE_TEST )
                 .forEach( id -> {
@@ -87,7 +91,7 @@ public class SubscriberTest {
         // Verify
         Assertions.assertEquals(SIZE_TEST, result.getTotalMessages());
         Assertions.assertTrue(result.getDuration() > 0);
-        Assertions.assertEquals(getChecksum(), result.getChecksum());
+        Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
     }
 
     @Test

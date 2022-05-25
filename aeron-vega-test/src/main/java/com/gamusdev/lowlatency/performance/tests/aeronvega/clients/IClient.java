@@ -19,7 +19,7 @@ public interface IClient {
      * When starts, the JVN creates some optimizations, but it needs some training.
      * Number of messages sent to warn up the JVM.
      * */
-    //int WARN_UP_MESSAGES = 1_000_000;
+    int WARN_UP_MESSAGES = 1_000_000;
 
     /** Execute the client code
      *

@@ -7,6 +7,7 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Checksum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.BackPressureManager;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
@@ -33,9 +34,6 @@ public class Publisher implements IClient {
     /** The reused buffer */
     private final UnsafeBuffer sendBuffer;
 
-    /** The checksum is the sum of all the messageId published */
-    private long checksum = 0;
-
     /**
      * Constructor
      */
@@ -61,13 +59,6 @@ public class Publisher implements IClient {
     }
 
     /**
-     * Method to clear all counters and checksum
-     */
-    /*private void cleanCounters() {
-        checksum = 0;
-    }*/
-
-    /**
      * When starts, the JVN creates some optimizations, but it needs some training.
      * Number of messages sent to warn up the JVM.
      * The purpose of this method is to train the JVM
@@ -80,9 +71,6 @@ public class Publisher implements IClient {
                 n -> n <= WARN_UP_MESSAGES,// Predicate to finish
                 n -> n + 1                      // Increment
         ).forEach( id -> sendMsg(topicPublisher, id) );
-
-        // Initialize the counters
-        cleanCounters();
 
         log.info("****** Finished Vega warm up ******");
 
@@ -118,7 +106,7 @@ public class Publisher implements IClient {
         return TestResults.builder()
                 .totalMessages(sizeTest)
                 .duration(durationTime)
-                .checksum(checksum)
+                .checksum(Checksum.getChecksum(sizeTest))
                 .build();
     }
 
@@ -136,10 +124,6 @@ public class Publisher implements IClient {
         if (BackPressureManager.checkAndControl(result)) {
             //Resend the message
             sendMsg(topicPublisher, messageId);
-        }
-        else if(messageId != CLOSE_ID) {
-            // Add the id to the checksum
-            checksum += messageId;
         }
 
     }

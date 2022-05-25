@@ -5,6 +5,7 @@ import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Checksum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import org.agrona.concurrent.UnsafeBuffer;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +27,7 @@ import static org.mockito.ArgumentMatchers.eq;
 @ExtendWith(MockitoExtension.class)
 public class PublisherTest {
 
-    private static final int SIZE_TEST = 1_000;
+    private static final int SIZE_TEST = 1_000_000;
 
     private static final int MAX_BACKPRESSURE_OCCURRENCES = 20;
 
@@ -38,11 +39,7 @@ public class PublisherTest {
     @InjectMocks
     private Publisher publisher;
 
-    private long getChecksum() {
-        return LongStream.rangeClosed( 1, SIZE_TEST ).sum();
-    }
-
-    @Test
+        @Test
     public void runOkTest () throws VegaException, InterruptedException {
         // When
 
@@ -58,7 +55,7 @@ public class PublisherTest {
         // Verify
         Assertions.assertEquals(SIZE_TEST, result.getTotalMessages());
         Assertions.assertTrue(result.getDuration() > 0);
-        Assertions.assertEquals(getChecksum(), result.getChecksum());
+        Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
 
         // Verify that the number of messages sent is the SIZE_TEST + 1 (the end signal)
         Mockito.verify(topicPublisher, Mockito.times(SIZE_TEST+1)).sendMsg(any(UnsafeBuffer.class), eq(0), eq(PAYLOAD_SIZE));
@@ -99,7 +96,7 @@ public class PublisherTest {
         // Verify
         Assertions.assertEquals(SIZE_TEST, result.getTotalMessages());
         Assertions.assertTrue(result.getDuration() > 0);
-        Assertions.assertEquals(getChecksum(), result.getChecksum());
+        Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
 
         // Verify that the number of messages sent is the SIZE_TEST + 1 (the end signal) + backPressureOccurrences (resends by BackPressure)
         Mockito.verify(topicPublisher, Mockito.times(SIZE_TEST + 1 + backPressureOccurrences))
