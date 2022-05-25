@@ -30,6 +30,6 @@ public final class ClientFactory {
         return ServiceLoader.load(IClient.class).stream()
                 .map(ServiceLoader.Provider::get)
                 .filter( c -> c.getClientType().equals(testType))
-                .collect(Collectors.toList()).get(0);
+                .findFirst().get();
     }
 }
