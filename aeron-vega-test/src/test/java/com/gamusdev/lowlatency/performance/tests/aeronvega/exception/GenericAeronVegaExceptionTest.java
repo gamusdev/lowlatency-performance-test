@@ -14,7 +14,7 @@ public class GenericAeronVegaExceptionTest {
     @Test
     public void GenericAeronVegaExceptionStringConstructor() {
         // When
-        var ex = new GenericAeronVegaException(MSG);
+        final var ex = new GenericAeronVegaException(MSG);
 
         // Verify
         Assertions.assertEquals(MSG, ex.getMessage());
@@ -23,7 +23,7 @@ public class GenericAeronVegaExceptionTest {
     @Test
     public void GenericAeronVegaExceptionThrowableConstructor() {
         // When
-        var ex = new GenericAeronVegaException(throwable);
+        final var ex = new GenericAeronVegaException(throwable);
 
         // Verify
         Assertions.assertEquals(throwable, ex.getCause());
@@ -32,7 +32,7 @@ public class GenericAeronVegaExceptionTest {
     @Test
     public void GenericAeronVegaExceptionStringAndThrowableConstructor() {
         // When
-        var ex = new GenericAeronVegaException(MSG, throwable);
+        final var ex = new GenericAeronVegaException(MSG, throwable);
 
         // Verify
         Assertions.assertEquals(MSG, ex.getMessage());

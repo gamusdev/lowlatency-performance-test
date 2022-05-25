@@ -24,10 +24,10 @@ public class BackPressureManagerTest {
 
         Thread.sleep(LAST_BACK_PRESSURED);
 
-        long start = System.currentTimeMillis();
+        final long start = System.currentTimeMillis();
         Assertions.assertTrue(BackPressureManager.checkAndControl(PublishResult.BACK_PRESSURED));
 
-        long finish = System.currentTimeMillis();
+        final long finish = System.currentTimeMillis();
 
         // Test that the check sleeps less than MAX_SLEEP / 10 second
         Assertions.assertTrue( finish - start < MAX_SLEEP / LAST_BACK_PRESSURED);
