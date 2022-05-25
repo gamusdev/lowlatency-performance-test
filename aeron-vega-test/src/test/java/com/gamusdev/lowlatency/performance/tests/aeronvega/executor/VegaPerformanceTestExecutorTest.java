@@ -79,9 +79,6 @@ public class VegaPerformanceTestExecutorTest {
             serviceLoaderFactoryMock.when( () -> ServiceLoader.load(ICommandLineParser.class)).thenReturn(serviceLoaderMock);
             Mockito.when(serviceLoaderMock.findFirst()).thenReturn(optional);
 
-            // Service Loader Mock
-            serviceLoaderFactoryMock.when( () -> ServiceLoader.load(IClient.class)).thenReturn(serviceLoaderMock);
-
             // LaunchParameters
             Mockito.when(commandLineParserMock.parseCommandLine(ARGS)).thenReturn(launchParametersMock);
             Mockito.when(launchParametersMock.getVegaConfigFilePath()).thenReturn(CONFIG_FILE_PATH);
@@ -104,7 +101,6 @@ public class VegaPerformanceTestExecutorTest {
 
                 // ******* Verify
                 // ClientFactory && client.run
-                serviceLoaderFactoryMock.verify(() -> ServiceLoader.load(IClient.class));
                 clientFactoryMock.verify(() -> ClientFactory.getInstance(any()));
                 Mockito.verify(client, Mockito.times(1)).run(eq(vegaInstanceMock), eq(SIZE));
 

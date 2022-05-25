@@ -20,6 +20,7 @@ public final class ClientFactory {
 
     /**
      * Factory method that returns an instance of the desired client.
+     * Lazy initialization: Only load the objects as they are requested
      * The service loader uses META-INF/services/ files to inject the services
      * See: https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/ServiceLoader.html
      * @param testType ClientTypeEnum.PUB or ClientTypeEnum.SUB
