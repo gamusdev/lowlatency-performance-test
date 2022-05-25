@@ -7,6 +7,7 @@ import com.bbva.kyof.vega.exception.VegaException;
 import com.bbva.kyof.vega.msg.PublishResult;
 import com.bbva.kyof.vega.protocol.IVegaInstance;
 import com.bbva.kyof.vega.protocol.publisher.ITopicPublisher;
+import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Checksum;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.Constants;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.utils.BackPressureManager;
 import com.gamusdev.lowlatency.performance.tests.aeronvega.model.TestResults;
@@ -22,16 +23,16 @@ import org.agrona.concurrent.UnsafeBuffer;
 public class Publisher implements IClient {
 
     /** Time to wait to set up channels */
-    private final static int TIME_TO_WAIT = 3000;
+    private static final int TIME_TO_WAIT = 3000;
+
+    /** Size of the data sent (one integer)*/
+    private static final int PAYLOAD_SIZE = 4;
 
     /** Enum ClientType to indicate PUB (publisher) */
     private final ClientTypeEnum clientType = ClientTypeEnum.PUB;
 
     /** The reused buffer */
     private final UnsafeBuffer sendBuffer;
-
-    /** The checksum is the sum of all the messageId published */
-    private long checksum = 0;
 
     /**
      * Constructor
@@ -40,7 +41,7 @@ public class Publisher implements IClient {
         super();
 
         // Initialize the buffer
-        sendBuffer = new UnsafeBuffer(ByteBuffer.allocate(4));
+        sendBuffer = new UnsafeBuffer(ByteBuffer.allocate(PAYLOAD_SIZE));
     }
 
     /**
@@ -51,17 +52,10 @@ public class Publisher implements IClient {
         // Subscribe to topic as publisher
         final ITopicPublisher topicPublisher = instance.createPublisher(Constants.TOPIC_NAME);
 
-        // Waiting for the channels to be established.
+        // Waiting for the Aeron channels to be established.
         Thread.sleep(TIME_TO_WAIT);
 
         return topicPublisher;
-    }
-
-    /**
-     * Method to clear all counters and checksum
-     */
-    private void cleanCounters() {
-        checksum = 0;
     }
 
     /**
@@ -69,7 +63,7 @@ public class Publisher implements IClient {
      * Number of messages sent to warn up the JVM.
      * The purpose of this method is to train the JVM
      * */
-    private void warnUpJVM(ITopicPublisher topicPublisher) throws InterruptedException {
+    /*private void warnUpJVM(ITopicPublisher topicPublisher) throws InterruptedException {
         log.info("****** Start Vega warm up ******");
 
         // Send the training messages
@@ -78,14 +72,11 @@ public class Publisher implements IClient {
                 n -> n + 1                      // Increment
         ).forEach( id -> sendMsg(topicPublisher, id) );
 
-        // Initialize the counters
-        cleanCounters();
-
         log.info("****** Finished Vega warm up ******");
 
         // Give some time to the receiver to consume the warm messages
         Thread.sleep(TIME_TO_WAIT);
-    }
+    }*/
 
     /**
      * Execute the test
@@ -115,7 +106,7 @@ public class Publisher implements IClient {
         return TestResults.builder()
                 .totalMessages(sizeTest)
                 .duration(durationTime)
-                .checksum(checksum)
+                .checksum(Checksum.getChecksum(sizeTest))
                 .build();
     }
 
@@ -127,16 +118,12 @@ public class Publisher implements IClient {
 
         // Prepare and send the message
         sendBuffer.putInt(0, messageId);
-        final PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, 4);
+        final PublishResult result = topicPublisher.sendMsg(sendBuffer, 0, PAYLOAD_SIZE);
 
         // Check if we have back pressure
         if (BackPressureManager.checkAndControl(result)) {
             //Resend the message
             sendMsg(topicPublisher, messageId);
-        }
-        else if(messageId != CLOSE_ID) {
-            // Add the id to the checksum
-            checksum += messageId;
         }
 
     }
@@ -158,13 +145,14 @@ public class Publisher implements IClient {
      * @throws VegaException Vega Exception
      * @throws InterruptedException Interrupted Exception
      */
-    public TestResults run (final IVegaInstance instance, int sizeTest)
+    public TestResults run (final IVegaInstance instance, final int sizeTest)
             throws VegaException, InterruptedException {
 
         // Create the channel
         final ITopicPublisher topicPublisher = createChannels(instance);
 
-        warnUpJVM(topicPublisher);
+        // To let the JVM take some optimizations before the test
+        // warnUpJVM(topicPublisher);
 
         // Execute the tests
         final var testResults = executeTest(topicPublisher, sizeTest);

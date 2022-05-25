@@ -15,7 +15,7 @@ public class VegaCommandLineParser implements ICommandLineParser {
             "(Optional) Defines the client as a publisher or a subscriber. " +
                     "\"pub\" for publisher, \"sub\" for subscriber. Default Value: subscriber");
 
-    /** Parameter to indicate if it is a publisher or a subscriber */
+    /** Parameter to indicate the Vega config file path */
     private final Option vegaConfigFilePath = new Option("f", "file", true,
             "Configuration file path");
 
