@@ -72,9 +72,9 @@ public class Publisher implements IClient {
         final long startTime = System.currentTimeMillis();
 
         // Send the test messages
-        Stream.iterate(1,                   // start
-                n -> n <= sizeTest,// Predicate to finish
-                n -> n + 1                      // Increment
+        Stream.iterate(1,                        // start
+                n -> n <= sizeTest,              // Predicate to finish
+                n -> n + 1                       // Increment
         ).forEach( id -> sendMsg(topicPublisher, id) );
 
         // Take the duration
