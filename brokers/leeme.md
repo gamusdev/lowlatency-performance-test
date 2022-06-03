@@ -5,7 +5,7 @@ If you have both binders in your pom.xml, you just need to change the configurat
 This code is a simple performance test with both brokers. The test is done without any optimization, 
 neither in the brokers nor in the Java Virtual Machines of the Publishers and Subscribers.
 
-
+The test is executed with one standalone brokers.
 
 ## Publishers & Subscribers
 The clients are using Spring Cloud Streams with Flux.
@@ -22,6 +22,25 @@ To execute the clients:
 ````
 java -jar pathToTarget/brokers-0.0.1.jar
 ````
+
+### About the code
+Once you are using SCS, you can write code interacting with brokers with very simple classes. SCS abstracts you about 
+the specific code of the brokers. You just create a Supplier<Flux< ? >> to publish data, 
+and a Consumer<Flux< ? >> to create a subscriber. 
+
+The stream sent/received is a Flux<Integers> with the configured sizeTest messages, finishing with a CLOSE signal to end the test.
+
+The 3 most important classes are:
+````
+com.gamusdev.lowlatency.performance.tests.brokers.configuration.producer.Publisher
+com.gamusdev.lowlatency.performance.tests.brokers.configuration.consumer.Subscriber
+com.gamusdev.lowlatency.performance.tests.brokers.interceptor.PerformanceChannelInterceptor
+````
+
+- The Publisher class creates the Supplier<Flux< Integers >>.
+- The Subscriber class creates the Consumer<Flux< Integers >>.
+- The PerformanceChannelInterceptor interceptor measures the duration of the test, and ends the application when 
+the CLOSE signal is received.
 
 ## RabbitMQ
 
