@@ -62,11 +62,7 @@ public class SubscriberTest {
             // Wait until the test is finished
             cyclicBarrier.await();
 
-        } catch (VegaException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
+        } catch (VegaException | InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
         }
     }
@@ -92,6 +88,12 @@ public class SubscriberTest {
         listener.onMessageReceived(iRcvMessage);
     }
 
+    /**
+     * Test a normal execution
+     * @throws VegaException
+     * @throws InterruptedException
+     * @throws BrokenBarrierException
+     */
     @Test
     public void runOk() throws VegaException, InterruptedException, BrokenBarrierException {
         // Wait the Subscriber some time to get up
@@ -123,8 +125,12 @@ public class SubscriberTest {
         Assertions.assertEquals(Checksum.getChecksum(SIZE_TEST), result.getChecksum());
     }
 
-
-
+    /**
+     * Test a failed execution
+     * @throws VegaException
+     * @throws InterruptedException
+     * @throws BrokenBarrierException
+     */
     @Test
     public void runKO() throws VegaException, InterruptedException, BrokenBarrierException {
         // Wait the Subscriber some time to get up
@@ -151,6 +157,9 @@ public class SubscriberTest {
         Assertions.assertTrue(result.getDuration() > 0);
     }
 
+    /**
+     * Test getClientType
+     */
     @Test
     public void getClientTypeTest() {
         Assertions.assertEquals(IClient.ClientTypeEnum.SUB, subscriber.getClientType());

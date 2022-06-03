@@ -17,7 +17,6 @@ public class BackPressureManagerTest {
         Assertions.assertFalse(BackPressureManager.checkAndControl(PublishResult.OK));
     }
 
-
     @Test
     public void checkAndControlWithBackPresure() throws InterruptedException {
         Assertions.assertTrue(BackPressureManager.checkAndControl(PublishResult.BACK_PRESSURED));

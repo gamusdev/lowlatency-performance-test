@@ -38,7 +38,12 @@ public class PublisherTest {
     @InjectMocks
     private Publisher publisher;
 
-        @Test
+    /**
+     * Test a normal execution
+     * @throws VegaException
+     * @throws InterruptedException
+     */
+    @Test
     public void runOkTest () throws VegaException, InterruptedException {
         // When
 
@@ -60,11 +65,19 @@ public class PublisherTest {
         Mockito.verify(topicPublisher, Mockito.times(SIZE_TEST+1)).sendMsg(any(UnsafeBuffer.class), eq(0), eq(PAYLOAD_SIZE));
     }
 
+    /**
+     * Test the getClientType
+     */
     @Test
     public void getClientTypeTest() {
         Assertions.assertEquals(IClient.ClientTypeEnum.PUB, publisher.getClientType());
     }
 
+    /**
+     * Test with Back Pressure
+     * @throws VegaException
+     * @throws InterruptedException
+     */
     @Test
     public void runWithBackPressureOkTest () throws VegaException, InterruptedException {
         // When

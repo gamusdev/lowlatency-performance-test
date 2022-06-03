@@ -17,6 +17,9 @@ public class ClientFactoryTest {
     @Mock
     private ServiceLoader<IClient> serviceLoaderMock;
 
+    /**
+     * Test to get an Instance
+     */
     @Test
     public void getInstanceTest() {
         // **** When
