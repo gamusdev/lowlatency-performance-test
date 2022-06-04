@@ -46,18 +46,18 @@ This test will be executed on an unicast network.
 
 To execute the AutoDiscovery Daemon:
 ````
-java -jar target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.bbva.kyof.vega.autodiscovery.daemon.UnicastDaemonLauncher -ed -sn 192.168.1.0/24
+java -cp target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.bbva.kyof.vega.autodiscovery.daemon.UnicastDaemonLauncher -ed -sn 192.168.1.0/24
 ````
 
 To execute the clients:
 ````
-java -jar target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher params
+java -cp target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher params
 
 Example publisher:
-java -jar target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -f ./publisher.xml -c pub -s 10000000
+java -cp target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -f ./src/main/resources/publisher.xml -c pub -s 10000000
 
 Example subscriber:
-java -jar target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -f ./subscriber.xml -c sub -s 10000000
+java -cp target/aeron-vega-test-1.0.0-jar-with-dependencies.jar com.gamusdev.lowlatency.performance.tests.aeronvega.Launcher -f ./src/main/resources/subscriber.xml -c sub -s 10000000
 ````
 
 ---
@@ -100,6 +100,12 @@ As said before, because the use of the java ServiceLoader, it is very easy to ad
 changing the code. Just add the new classes and modify the META-INF/services.
 
 ---
+
+To control the BackPressure, and do not lose data, the BackPressureManager implements
+a simple control flow mechanism:
+````
+com.gamusdev.lowlatency.performance.tests.aeronvega.utils.BackPressureManager
+````
 
 ## Author
 http://www.gamusdev.com

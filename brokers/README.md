@@ -26,7 +26,7 @@ broker.sizeTest=1000;broker.clientType=PUB
 
 To execute the clients:
 ````
-java -jar pathToTarget/brokers-0.0.1.jar
+`java -jar target/brokers-0.0.1.jar`
 ````
 
 ### About the code
