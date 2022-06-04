@@ -3,7 +3,6 @@ package com.gamusdev.lowlatency.performance.tests.aeronvega.clients;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ServiceLoader;
-import java.util.stream.Collectors;
 
 /**
  * Factory class to return the required Executor

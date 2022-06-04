@@ -2,10 +2,16 @@
 Using Spring Cloud Streams (SCS), you can change between RabbitMQ and Kafka changing the SCS binders in the pom.xml.
 If you have both binders in your pom.xml, you just need to change the configuration (application.yml).
 
-This code is a simple performance test with both brokers. The test is done without any optimization, 
+This code is a simple performance test with both messaging brokers. The test consists of sending a fixed number of Integers 
+through the brokers. Note that sending just one integer (4 bytes), implies sending alsa the TCP and IP headers,
+which significantly increases the traffic sent.  
+
+The test is done without any optimization, 
 neither in the brokers nor in the Java Virtual Machines of the Publishers and Subscribers.
 
 The test is executed with one standalone brokers.
+
+---
 
 ## Publishers & Subscribers
 The clients are using Spring Cloud Streams with Flux.
@@ -42,9 +48,11 @@ com.gamusdev.lowlatency.performance.tests.brokers.interceptor.PerformanceChannel
 - The PerformanceChannelInterceptor interceptor measures the duration of the test, and ends the application when 
 the CLOSE signal is received.
 
+---
+
 ## RabbitMQ
 
-To test the RabbitMQ broker, I used an image from dockerhub.
+To test the RabbitMQ broker, an image from dockerhub is used.
 ````
 docker pull rabbitmq:3-management
 
@@ -54,11 +62,13 @@ docker run --rm -d -p 15672:15672 -p 5672:5672 --name my_rabbit rabbitmq:3-manag
 localhost:15672 with guest/guest
 ````
 
+---
+
 ## Kafka
 
 To test the Kafka broker, used the Kafka binary downloaded from: https://kafka.apache.org/quickstart.
 
-Then, I created my own container with this simple Dockerfile
+Then, to created my own container with this simple Dockerfile:
 
 Dockerfile
 ````
@@ -111,3 +121,10 @@ try to insert the "container name" into /etc/hosts:
 ````
 127.0.0.1       8edb878dd0b6
 ````
+
+---
+
+## Author
+http://www.gamusdev.com
+
+dramirez@gamusdev.com
