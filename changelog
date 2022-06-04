@@ -1,0 +1,4 @@
+1.0.0
+-----
+- Adds aeron-vega-test 1.0.0: Simple performance test with Aeron & Vega sending integers
+- Adds brokers 1.0.0: Simple performance test with Spring Cloud Streams & Kafka | RabbitMQ
