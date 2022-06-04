@@ -6,7 +6,7 @@
 
   <groupId>com.gamusdev.lowlatency.performance.tests</groupId>
   <artifactId>parent</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>pom</packaging>
   <name>parent</name>
   <url>http://www.gamusdev.com</url>
@@ -19,9 +19,7 @@
 
   <modules>
     <module>aeron-vega-test</module>
-    <module>rabbitmq-test</module>
-    <module>kafka-test</module>
-    <module>aws-test</module>
+    <module>brokers</module>
   </modules>
 
   <build>
