@@ -21,7 +21,7 @@ public class VegaCommandLineParser implements ICommandLineParser {
 
     /** Parameter to indicate the number of messages sent / received in the test */
     private final Option sizeTest = new Option("s", "size", true,
-            "Number of messages sent in this test");
+            "(Optional) Number of messages sent in this test. Default value 1_000_000");
 
     /**
      * Add the common command line options to the options list, 
