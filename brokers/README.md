@@ -24,9 +24,29 @@ Example
 broker.sizeTest=1000;broker.clientType=PUB
 ````
 
-To execute the clients:
+To execute the clients, first add the required environment variables, and then execute:
 ````
-`java -jar target/brokers-0.0.1.jar`
+env broker.sizeTest={size} bash
+env broker.clientType={PUB|SUB} bash
+env  | grep broker
+
+java -jar target/brokers-0.0.1.jar
+
+# Publisher
+env broker.sizeTest=100000 bash
+env broker.clientType=PUB bash
+java -jar target/brokers-0.0.1.jar
+
+# Subscriber
+env broker.sizeTest=100000 bash
+env broker.clientType=SUB bash
+java -jar target/brokers-0.0.1.jar
+````
+Note: Bash does not allow enviaronment variables with non-alphanumeric characters. 
+So, it can not be used the export command like:
+````
+export broker.sizeTest={size}
+export broker.clientType={PUB|SUB}
 ````
 
 ### About the code
