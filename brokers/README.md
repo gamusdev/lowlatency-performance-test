@@ -30,17 +30,17 @@ env broker.sizeTest={size} bash
 env broker.clientType={PUB|SUB} bash
 env  | grep broker
 
-java -jar target/brokers-0.0.1.jar
+java -jar target/brokers-1.0.0.jar
 
 # Publisher
 env broker.sizeTest=100000 bash
 env broker.clientType=PUB bash
-java -jar target/brokers-0.0.1.jar
+java -jar target/brokers-1.0.0.jar
 
 # Subscriber
 env broker.sizeTest=100000 bash
 env broker.clientType=SUB bash
-java -jar target/brokers-0.0.1.jar
+java -jar target/brokers-1.0.0.jar
 ````
 Note: Bash does not allow enviaronment variables with non-alphanumeric characters. 
 So, it can not be used the export command like:
@@ -148,3 +148,4 @@ try to insert the "container name" into /etc/hosts:
 http://www.gamusdev.com
 
 dramirez@gamusdev.com
+

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.gamusdev.lowlatency.performance.tests</groupId>
 	<artifactId>brokers</artifactId>
-	<version>0.0.1</version>
+	<version>1.0.0</version>
 	<name>brokers</name>
 	<description>Performance Tests with brokers</description>
 	<properties>
